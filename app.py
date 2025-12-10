@@ -80,7 +80,9 @@ def main():
     
     page = st.sidebar.radio(
         "Navegação",
-        ["🏠 Dashboard", "🎯 Match Hub", "🏆 DreamLeague S27", "👥 Pro Teams", "🎮 Pro Players", "📊 Analytics 2025", "📅 Eventos", "💰 Apostas"]
+        ["🏠 Dashboard", "🏆 DreamLeague S27", "💰 Apostas"]
+        # Hidden pages (uncomment to enable):
+        # "🎯 Match Hub", "👥 Pro Teams", "🎮 Pro Players", "📊 Analytics 2025", "📅 Eventos"
     )
     
     st.sidebar.markdown("---")
@@ -127,60 +129,127 @@ def main():
         render_bets()
 
 def render_dashboard():
-    """Render main dashboard."""
-    st.title("🔥 Prometheus V7")
-    st.subheader("Dota 2 Analytics & Betting Platform")
+    """Render main dashboard - Quick Overview for Betting."""
+    st.title("🔥 Prometheus V7.3 - Dashboard")
     
-    col1, col2, col3, col4 = st.columns(4)
+    import pytz
+    sp_tz = pytz.timezone('America/Sao_Paulo')
+    current_time = datetime.now(sp_tz)
     
+    # Header with live clock
+    col1, col2, col3 = st.columns([2, 1, 1])
+    with col1:
+        st.markdown(f"### ⏰ {current_time.strftime('%H:%M:%S')} BRT")
+    with col2:
+        st.markdown(f"📅 **{current_time.strftime('%d/%m/%Y')}**")
+    with col3:
+        if st.button("🔄 Refresh", key="dash_refresh"):
+            st.rerun()
+    
+    st.markdown("---")
+    
+    # Load data
     bets = _load_bets()
-    pro_teams = _load_pro_teams()
-    pro_players = _load_pro_players()
     dl = _load_dreamleague()
+    schedule = dl.get("schedule", {})
+    teams = dl.get("teams", [])
+    tournament = dl.get("tournament", {})
     
+    # Main metrics
+    col1, col2, col3, col4 = st.columns(4)
     with col1:
         st.metric("💵 Banca", f"R$ {bets.get('bankroll', 1000):.2f}")
     with col2:
-        teams_count = len(pro_teams.get("teams", []))
-        st.metric("🏆 Pro Teams", teams_count)
+        active_bets = len([b for b in bets.get("bets", []) if b.get("status") == "pending"])
+        st.metric("🎯 Apostas Ativas", active_bets)
     with col3:
-        players_count = len(pro_players.get("players", []))
-        st.metric("🎮 Pro Players", players_count)
+        st.metric("💰 Prize Pool", f"${tournament.get('prize_pool', 0):,}")
     with col4:
-        dl_teams = len(dl.get("teams", []))
-        st.metric("📊 DreamLeague Teams", dl_teams)
+        st.metric("🎮 Times DL", len(teams))
     
     st.markdown("---")
     
-    st.subheader("🏆 Top Teams by Rating (OpenDota)")
+    # PRÓXIMAS PARTIDAS HOJE
+    st.subheader("📅 Próximas Partidas - Hoje")
     
-    teams = pro_teams.get("teams", [])[:6]
-    if teams:
-        cols = st.columns(3)
-        for i, team in enumerate(teams):
-            with cols[i % 3]:
-                rating = team.get("rating", 0)
-                winrate = team.get("recent_stats", {}).get("winrate", 0)
-                st.metric(
-                    team.get("name", "Unknown"),
-                    f"⭐ {rating:.0f}",
-                    f"{winrate}% WR"
-                )
+    round_1 = schedule.get("round_1", {}).get("matches", [])
+    
+    if round_1:
+        # Find upcoming matches
+        upcoming = []
+        for match in round_1:
+            time_str = match.get('time_brt', '12:00')
+            if len(time_str) > 5:
+                time_str = time_str[:5]
+            try:
+                match_time = datetime.strptime(f"2025-12-10 {time_str}", "%Y-%m-%d %H:%M")
+                match_time = sp_tz.localize(match_time)
+                hours_until = (match_time - current_time).total_seconds() / 3600
+                if hours_until > -3:  # Include recent matches
+                    upcoming.append({**match, "hours_until": hours_until, "time_parsed": time_str})
+            except:
+                pass
+        
+        # Sort by time
+        upcoming.sort(key=lambda x: x.get("hours_until", 999))
+        
+        for match in upcoming[:6]:  # Show next 6 matches
+            hours = match.get("hours_until", 0)
+            
+            if hours <= 0:
+                status = "🔴 LIVE/Recente"
+                color = "red"
+            elif hours <= 1:
+                status = f"⚠️ {int(hours*60)}min"
+                color = "orange"
+            elif hours <= 2:
+                status = f"🟡 {hours:.1f}h"
+                color = "yellow"
+            else:
+                status = f"🟢 {hours:.1f}h"
+                color = "green"
+            
+            col1, col2, col3, col4, col5 = st.columns([1, 2, 0.5, 2, 1.5])
+            
+            with col1:
+                st.write(f"**{match.get('time_parsed')}**")
+            with col2:
+                st.write(f"**{match.get('team_a')}**")
+            with col3:
+                st.write("vs")
+            with col4:
+                st.write(f"**{match.get('team_b')}**")
+            with col5:
+                st.markdown(f"**{status}**")
+            
+            st.markdown("---")
+    else:
+        st.info("Nenhuma partida agendada para hoje")
+    
+    # Quick Stats - Times Tier S
+    st.subheader("⭐ Times Tier S - DreamLeague")
+    
+    tier_s = [t for t in teams if t.get("tier") == "S"]
+    
+    if tier_s:
+        cols = st.columns(min(len(tier_s), 4))
+        for i, team in enumerate(tier_s[:4]):
+            with cols[i]:
+                st.markdown(f"### {team.get('name')}")
+                st.caption(f"🌍 {team.get('region')} | #{team.get('ranking', 'N/A')}")
+                roster = team.get("roster", [])
+                if roster:
+                    st.caption(f"⭐ {roster[0].get('name', '')} (carry)")
     
     st.markdown("---")
     
-    st.subheader("🏆 DreamLeague Season 27")
-    
-    tournament = dl.get("tournament", {})
-    col1, col2, col3 = st.columns(3)
-    
+    # Stream Links
+    st.subheader("📺 Streams")
+    col1, col2 = st.columns(2)
     with col1:
-        st.info(f"**Prize Pool:** ${tournament.get('prize_pool', 0):,}")
+        st.link_button("🟣 Twitch - DreamLeague", "https://twitch.tv/dreamleague")
     with col2:
-        st.info(f"**Start:** {tournament.get('start_date', 'TBD')}")
-    with col3:
-        format_info = tournament.get('format', {}).get('group_stage', {}).get('type', 'Swiss')
-        st.info(f"**Format:** {format_info}")
+        st.link_button("🔴 YouTube - DreamLeague", "https://youtube.com/dreamleague")
 
 def render_dreamleague():
     """Render DreamLeague S27 page - COMPLETE HUB."""
@@ -250,6 +319,9 @@ def render_dreamleague():
         for i, match in enumerate(round_1):
             # Calculate countdown
             time_str = match.get('time_brt', '12:00')
+            # Handle both HH:MM and HH:MM:SS formats
+            if len(time_str) > 5:
+                time_str = time_str[:5]  # Truncate to HH:MM
             match_date = datetime.strptime(f"2025-12-10 {time_str}", "%Y-%m-%d %H:%M")
             match_date = sp_tz.localize(match_date)
             
@@ -683,46 +755,244 @@ def render_events():
             st.markdown("---")
 
 def render_bets():
-    """Render bets management page."""
+    """Render bets management page - Complete betting tracker."""
     st.title("💰 Gestão de Apostas")
     
-    bets_data = _load_bets()
+    import pytz
+    sp_tz = pytz.timezone('America/Sao_Paulo')
+    current_time = datetime.now(sp_tz)
     
-    col1, col2, col3 = st.columns(3)
+    bets_data = _load_bets()
+    dl = _load_dreamleague()
+    teams = dl.get("teams", [])
+    schedule = dl.get("schedule", {})
+    
+    # Try to import modules
+    try:
+        from odds_tracker import calculate_kelly
+        CALC_AVAILABLE = True
+    except:
+        CALC_AVAILABLE = False
+    
+    # Main metrics
+    col1, col2, col3, col4 = st.columns(4)
+    
+    bankroll = bets_data.get('bankroll', 1000)
+    all_bets = bets_data.get("bets", [])
+    pending = [b for b in all_bets if b.get("status") == "pending"]
+    won = [b for b in all_bets if b.get("status") == "won"]
+    lost = [b for b in all_bets if b.get("status") == "lost"]
     
     with col1:
-        st.metric("💵 Banca", f"R$ {bets_data.get('bankroll', 1000):.2f}")
+        st.metric("💵 Banca Atual", f"R$ {bankroll:.2f}")
     with col2:
-        st.metric("📊 Apostas", len(bets_data.get("bets", [])))
+        st.metric("🎯 Pendentes", len(pending))
     with col3:
-        st.metric("📈 ROI", "N/A")
+        st.metric("✅ Ganhas", len(won))
+    with col4:
+        st.metric("❌ Perdidas", len(lost))
+    
+    # Calculate P/L
+    total_won = sum(b.get("profit", 0) for b in won)
+    total_lost = sum(b.get("stake", 0) for b in lost)
+    net_pl = total_won - total_lost
+    
+    if net_pl >= 0:
+        st.success(f"📈 Lucro Total: **R$ {net_pl:.2f}**")
+    else:
+        st.error(f"📉 Prejuízo Total: **R$ {abs(net_pl):.2f}**")
     
     st.markdown("---")
     
-    st.subheader("📝 Nova Aposta")
+    # Tabs
+    tab1, tab2, tab3, tab4 = st.tabs(["➕ Nova Aposta", "📋 Apostas Ativas", "📊 Histórico", "🧮 Calculadora"])
     
-    dl = _load_dreamleague()
-    teams = [t.get("name") for t in dl.get("teams", [])]
-    
-    with st.form("new_bet"):
+    # TAB 1 - NOVA APOSTA
+    with tab1:
+        st.subheader("➕ Registrar Nova Aposta")
+        
+        # Get upcoming matches for quick selection
+        round_1 = schedule.get("round_1", {}).get("matches", [])
+        match_options = [f"{m.get('team_a')} vs {m.get('team_b')}" for m in round_1]
+        
         col1, col2 = st.columns(2)
         
         with col1:
-            team_a = st.selectbox("Time A", teams if teams else [""])
-            team_b = st.selectbox("Time B", teams if teams else [""])
-            selection = st.selectbox("Seleção", [team_a, team_b] if team_a else [""])
+            st.markdown("##### 📅 Partida")
+            
+            if match_options:
+                selected_match = st.selectbox("Selecionar Partida", ["Personalizado"] + match_options)
+                
+                if selected_match != "Personalizado":
+                    parts = selected_match.split(" vs ")
+                    team_a = parts[0]
+                    team_b = parts[1] if len(parts) > 1 else ""
+                else:
+                    team_names = [t.get("name") for t in teams]
+                    team_a = st.selectbox("Time A", team_names)
+                    team_b = st.selectbox("Time B", [t for t in team_names if t != team_a])
+            else:
+                team_names = [t.get("name") for t in teams]
+                team_a = st.selectbox("Time A", team_names)
+                team_b = st.selectbox("Time B", [t for t in team_names if t != team_a])
+            
+            selection = st.radio("🎯 Apostar em:", [team_a, team_b])
         
         with col2:
-            odds = st.number_input("Odds", min_value=1.01, value=1.50, step=0.01)
-            stake = st.number_input("Valor (R$)", min_value=10.0, value=50.0, step=10.0)
+            st.markdown("##### 💰 Valores")
+            
+            odds = st.number_input("Odd", min_value=1.01, max_value=50.0, value=1.80, step=0.01)
+            
+            # Stake options
+            stake_type = st.radio("Tipo de Stake", ["Valor Fixo", "% da Banca", "Kelly"])
+            
+            if stake_type == "Valor Fixo":
+                stake = st.number_input("Valor (R$)", min_value=10.0, max_value=bankroll, value=50.0, step=10.0)
+            elif stake_type == "% da Banca":
+                pct = st.slider("% da Banca", 1, 20, 5)
+                stake = bankroll * (pct / 100)
+                st.info(f"Stake: R$ {stake:.2f}")
+            else:
+                prob = st.slider("Sua probabilidade (%)", 30, 90, 55)
+                if CALC_AVAILABLE:
+                    kelly_pct = calculate_kelly(prob, odds)
+                else:
+                    kelly_pct = max(0, (prob * odds - 100) / (odds - 1)) / 100 * 100
+                kelly_pct = min(kelly_pct, 10)  # Cap at 10%
+                stake = bankroll * (kelly_pct / 100)
+                st.info(f"Kelly: {kelly_pct:.1f}% = R$ {stake:.2f}")
+            
+            bookmaker = st.selectbox("Casa", ["bet365", "Betano", "Betfair", "Pinnacle", "1xBet", "Rivalry", "GG.bet", "Stake"])
         
+        # Preview
+        st.markdown("---")
         potential = stake * odds
-        st.info(f"💵 Retorno Potencial: **R$ {potential:.2f}**")
+        profit = potential - stake
         
-        submitted = st.form_submit_button("✅ Registrar Aposta")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("💵 Stake", f"R$ {stake:.2f}")
+        with col2:
+            st.metric("🎯 Retorno", f"R$ {potential:.2f}")
+        with col3:
+            st.metric("📈 Lucro", f"R$ {profit:.2f}")
         
-        if submitted:
-            st.success(f"✅ Aposta registrada: {selection} @ {odds}")
+        if st.button("✅ Registrar Aposta", type="primary"):
+            new_bet = {
+                "id": f"bet_{len(all_bets)+1}_{current_time.strftime('%Y%m%d%H%M')}",
+                "match": f"{team_a} vs {team_b}",
+                "selection": selection,
+                "odds": odds,
+                "stake": stake,
+                "potential": potential,
+                "bookmaker": bookmaker,
+                "status": "pending",
+                "created_at": current_time.isoformat(),
+                "profit": 0
+            }
+            
+            # In a real app, save to database
+            st.success(f"✅ Aposta registrada!")
+            st.json(new_bet)
+    
+    # TAB 2 - APOSTAS ATIVAS
+    with tab2:
+        st.subheader("📋 Apostas Pendentes")
+        
+        if pending:
+            for bet in pending:
+                with st.container():
+                    col1, col2, col3, col4 = st.columns([3, 1, 1, 2])
+                    
+                    with col1:
+                        st.write(f"**{bet.get('match')}**")
+                        st.caption(f"🎯 {bet.get('selection')} @ {bet.get('odds')}")
+                    with col2:
+                        st.write(f"R$ {bet.get('stake', 0):.2f}")
+                    with col3:
+                        st.write(f"→ R$ {bet.get('potential', 0):.2f}")
+                    with col4:
+                        col_a, col_b = st.columns(2)
+                        with col_a:
+                            if st.button("✅", key=f"win_{bet.get('id')}"):
+                                st.success("Marcada como GANHA")
+                        with col_b:
+                            if st.button("❌", key=f"lose_{bet.get('id')}"):
+                                st.error("Marcada como PERDIDA")
+                    
+                    st.markdown("---")
+        else:
+            st.info("Nenhuma aposta pendente")
+    
+    # TAB 3 - HISTÓRICO
+    with tab3:
+        st.subheader("📊 Histórico de Apostas")
+        
+        if all_bets:
+            # Convert to simple table
+            import pandas as pd
+            df_data = []
+            for bet in all_bets:
+                df_data.append({
+                    "Partida": bet.get("match", "N/A"),
+                    "Seleção": bet.get("selection", "N/A"),
+                    "Odd": bet.get("odds", 0),
+                    "Stake": f"R$ {bet.get('stake', 0):.2f}",
+                    "Status": bet.get("status", "pending"),
+                    "P/L": f"R$ {bet.get('profit', 0):.2f}"
+                })
+            
+            if df_data:
+                df = pd.DataFrame(df_data)
+                st.dataframe(df, use_container_width=True)
+        else:
+            st.info("Nenhuma aposta registrada ainda")
+    
+    # TAB 4 - CALCULADORA
+    with tab4:
+        st.subheader("🧮 Calculadora de Value & Kelly")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown("##### 📊 Value Bet Calculator")
+            
+            calc_odds = st.number_input("Odd disponível", min_value=1.01, value=2.00, step=0.01, key="calc_odd")
+            calc_prob = st.slider("Sua probabilidade (%)", 1, 99, 50, key="calc_prob")
+            
+            implied = 100 / calc_odds
+            value = calc_prob - implied
+            ev = (calc_prob/100 * (calc_odds - 1)) - ((100 - calc_prob)/100)
+            
+            st.markdown("---")
+            
+            st.metric("📈 Prob. Implícita", f"{implied:.1f}%")
+            
+            if value > 0:
+                st.success(f"✅ VALUE: **+{value:.1f}%**")
+                st.success(f"📈 EV: **+{ev*100:.1f}%**")
+            else:
+                st.error(f"❌ No Value: **{value:.1f}%**")
+        
+        with col2:
+            st.markdown("##### 🎯 Kelly Criterion")
+            
+            if value > 0:
+                kelly_full = (calc_prob/100 * calc_odds - 1) / (calc_odds - 1) * 100
+                kelly_half = kelly_full / 2
+                kelly_quarter = kelly_full / 4
+                
+                st.metric("Full Kelly", f"{kelly_full:.1f}%")
+                st.metric("Half Kelly (Recomendado)", f"{kelly_half:.1f}%")
+                st.metric("Quarter Kelly (Conservador)", f"{kelly_quarter:.1f}%")
+                
+                st.markdown("---")
+                st.caption(f"Para banca de R$ {bankroll:.2f}:")
+                st.write(f"• Full: R$ {bankroll * kelly_full/100:.2f}")
+                st.write(f"• Half: R$ {bankroll * kelly_half/100:.2f}")
+                st.write(f"• Quarter: R$ {bankroll * kelly_quarter/100:.2f}")
+            else:
+                st.warning("⚠️ Não aposte - sem value")
 
 
 def render_match_hub():
