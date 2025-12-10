@@ -183,8 +183,8 @@ def render_dashboard():
         st.info(f"**Format:** {format_info}")
 
 def render_dreamleague():
-    """Render DreamLeague S27 page."""
-    st.title("🏆 DreamLeague Season 27")
+    """Render DreamLeague S27 page - COMPLETE HUB."""
+    st.title("🏆 DreamLeague Season 27 - Hub Completo")
     
     data = _load_dreamleague()
     pro_teams = _load_pro_teams()
@@ -197,7 +197,23 @@ def render_dreamleague():
     teams = data.get("teams", [])
     schedule = data.get("schedule", {})
     
-    col1, col2, col3, col4 = st.columns(4)
+    # Import new modules
+    try:
+        from notifications import MatchSchedule, get_hours_until_match, format_countdown, get_countdown_color
+        from odds_tracker import get_tracker, calculate_kelly
+        from draft_analyzer import analyze_draft, analyze_single_draft
+        MODULES_AVAILABLE = True
+    except ImportError as e:
+        st.warning(f"⚠️ Módulos V7.3 não disponíveis: {e}")
+        MODULES_AVAILABLE = False
+    
+    # Live clock
+    import pytz
+    sp_tz = pytz.timezone('America/Sao_Paulo')
+    current_time = datetime.now(sp_tz)
+    
+    # Header metrics
+    col1, col2, col3, col4, col5 = st.columns(5)
     
     with col1:
         st.metric("💰 Prize Pool", f"${tournament.get('prize_pool', 0):,}")
@@ -207,22 +223,50 @@ def render_dreamleague():
         st.metric("🎮 Times", len(teams))
     with col4:
         st.metric("📍 Local", tournament.get("location", "Stockholm"))
+    with col5:
+        st.metric("🕐 Agora (BRT)", current_time.strftime('%H:%M'))
     
     st.markdown("---")
     
-    tab1, tab2, tab3 = st.tabs(["📅 Partidas Round 1", "👥 Times", "📊 Estatísticas"])
+    # Main tabs
+    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+        "📅 Próximas Partidas", 
+        "📊 Últimas Partidas", 
+        "👥 Times & Stats", 
+        "💰 Odds & Value",
+        "🎯 Draft Analyzer",
+        "📧 Notificações"
+    ])
     
+    # TAB 1 - PRÓXIMAS PARTIDAS COM COUNTDOWN
     with tab1:
-        st.subheader("📅 Round 1 - 10 de Dezembro 2025")
+        st.subheader("📅 Próximas Partidas - DreamLeague S27")
         
         round_1 = schedule.get("round_1", {}).get("matches", [])
         
-        for match in round_1:
+        if not round_1:
+            st.info("Nenhuma partida agendada")
+        
+        for i, match in enumerate(round_1):
+            # Calculate countdown
+            time_str = match.get('time_brt', '12:00')
+            match_date = datetime.strptime(f"2025-12-10 {time_str}", "%Y-%m-%d %H:%M")
+            match_date = sp_tz.localize(match_date)
+            
+            if MODULES_AVAILABLE:
+                hours_until = get_hours_until_match(match_date)
+                countdown = format_countdown(hours_until)
+                color = get_countdown_color(hours_until)
+            else:
+                hours_until = (match_date - current_time).total_seconds() / 3600
+                countdown = f"{hours_until:.1f}h" if hours_until > 0 else "🔴 LIVE"
+                color = "🟢" if hours_until > 2 else "🟠" if hours_until > 0 else "🔴"
+            
             with st.container():
-                col1, col2, col3, col4 = st.columns([1, 2, 2, 1])
+                col1, col2, col3, col4, col5 = st.columns([1, 2, 1, 2, 1.5])
                 
                 with col1:
-                    st.write(f"🕐 **{match.get('time_brt', 'TBD')} BRT**")
+                    st.write(f"🕐 **{time_str}** BRT")
                     st.caption(f"{match.get('time_cet', '')} CET")
                 
                 with col2:
@@ -230,71 +274,291 @@ def render_dreamleague():
                     st.write(f"**{team_a}**")
                 
                 with col3:
+                    st.write("**vs**")
+                    st.caption(match.get('format', 'Bo2'))
+                
+                with col4:
                     team_b = match.get("team_b", "TBD")
                     st.write(f"**{team_b}**")
                 
-                with col4:
-                    st.write(f"📋 {match.get('format', 'Bo3')}")
+                with col5:
+                    st.write(f"{color} **{countdown}**")
+                    if hours_until > 0 and hours_until <= 2:
+                        st.caption("⚠️ Relatório em breve!")
+                
+                # Expandable details
+                match_key = f"match_{i}"
+                if st.button(f"📊 Ver Análise", key=f"btn_{match_key}"):
+                    st.session_state[f"show_{match_key}"] = not st.session_state.get(f"show_{match_key}", False)
+                
+                if st.session_state.get(f"show_{match_key}", False):
+                    with st.expander("📊 Análise Detalhada", expanded=True):
+                        st.write(f"**{team_a} vs {team_b}**")
+                        st.write("• Head-to-Head: Calculando...")
+                        st.write("• Form recente: Carregando...")
+                        st.write("• Previsão: Aguardando análise AI")
                 
                 st.markdown("---")
     
+    # TAB 2 - ÚLTIMAS PARTIDAS
     with tab2:
-        st.subheader("👥 Times Participantes")
+        st.subheader("📊 Últimas Partidas Finalizadas")
+        
+        st.info("🔄 Conectar com OpenDota API para resultados em tempo real")
+        
+        # Placeholder for recent results
+        sample_results = [
+            {"team_a": "Team Liquid", "team_b": "Tundra", "score": "2-0", "duration": "34min avg"},
+            {"team_a": "Gaimin Gladiators", "team_b": "BetBoom", "score": "1-1", "duration": "41min avg"},
+        ]
+        
+        for result in sample_results:
+            col1, col2, col3, col4 = st.columns([2, 1, 2, 1])
+            with col1:
+                st.write(f"**{result['team_a']}**")
+            with col2:
+                st.write(f"**{result['score']}**")
+            with col3:
+                st.write(f"**{result['team_b']}**")
+            with col4:
+                st.caption(result['duration'])
+            st.markdown("---")
+    
+    # TAB 3 - TIMES & STATS
+    with tab3:
+        st.subheader("👥 Times Participantes - Multi-Layer Stats")
         
         pro_map = {t.get("team_id"): t for t in pro_teams.get("teams", [])}
         
-        tier_filter = st.selectbox("Filtrar por Tier", ["Todos", "S", "A", "B", "C"])
+        # Filters
+        col1, col2 = st.columns(2)
+        with col1:
+            tier_filter = st.selectbox("Filtrar por Tier", ["Todos", "S", "A", "B", "C"], key="tier_dl")
+        with col2:
+            region_filter = st.selectbox("Filtrar por Região", ["Todos", "EU", "NA", "CIS", "CN", "SEA"], key="region_dl")
         
         for team in teams:
             tier = team.get("tier", "C")
+            region = team.get("region", "EU")
+            
             if tier_filter != "Todos" and tier != tier_filter:
+                continue
+            if region_filter != "Todos" and region != region_filter:
                 continue
             
             tier_emoji = {"S": "🟣", "A": "🔵", "B": "🟢", "C": "⚪"}.get(tier, "⚪")
             team_id = team.get("team_id")
             pro_data = pro_map.get(team_id, {})
             
-            with st.expander(f"{tier_emoji} **{team.get('name')}** ({team.get('tag')}) - {team.get('region')}"):
+            with st.expander(f"{tier_emoji} **{team.get('name')}** ({team.get('tag')}) - {region}"):
+                # Layer 1: Basic Info
+                st.markdown("##### 📋 Informações Básicas")
                 col1, col2, col3 = st.columns(3)
                 
                 with col1:
-                    st.metric("🌍 Região", team.get("region", "N/A"))
+                    st.metric("🌍 Região", region)
                     st.metric("🏆 Ranking", f"#{team.get('ranking', 'N/A')}")
                 
                 with col2:
                     if pro_data:
                         st.metric("⭐ Rating", f"{pro_data.get('rating', 0):.0f}")
                         recent = pro_data.get("recent_stats", {})
-                        st.metric("📈 WR (100 games)", f"{recent.get('winrate', 0)}%")
+                        st.metric("📈 WR (100g)", f"{recent.get('winrate', 0)}%")
                     else:
                         st.metric("⭐ Rating", "N/A")
-                        st.metric("📈 WR", "N/A")
                 
                 with col3:
-                    st.write("**Roster:**")
-                    for player in team.get("roster", [])[:5]:
-                        st.write(f"• {player.get('name')} ({player.get('role')})")
+                    if pro_data:
+                        recent = pro_data.get("recent_stats", {})
+                        st.metric("✅ Wins", recent.get("wins", 0))
+                        st.metric("❌ Losses", recent.get("losses", 0))
+                
+                # Layer 2: Roster
+                st.markdown("##### 👥 Roster")
+                roster_cols = st.columns(5)
+                for i, player in enumerate(team.get("roster", [])[:5]):
+                    with roster_cols[i]:
+                        role_emoji = {"1": "⚔️", "2": "🎯", "3": "🛡️", "4": "💫", "5": "❤️"}.get(str(i+1), "🎮")
+                        st.write(f"{role_emoji} **{player.get('name')}**")
+                        st.caption(player.get('role', f'Pos {i+1}'))
+                
+                # Layer 3: Hero Pool (if available)
+                if pro_data and pro_data.get("top_heroes"):
+                    st.markdown("##### 🦸 Top Heroes")
+                    heroes = pro_data.get("top_heroes", [])[:5]
+                    hero_cols = st.columns(5)
+                    for i, hero in enumerate(heroes):
+                        with hero_cols[i]:
+                            st.write(f"**{hero.get('name', 'N/A')}**")
+                            st.caption(f"{hero.get('matches', 0)} games")
     
-    with tab3:
-        st.subheader("📊 Estatísticas dos Times")
+    # TAB 4 - ODDS & VALUE BETS
+    with tab4:
+        st.subheader("💰 Registro de Odds & Value Finder")
         
-        stats_data = []
-        for team in pro_teams.get("teams", []):
-            recent = team.get("recent_stats", {})
-            stats_data.append({
-                "Time": team.get("name"),
-                "Rating": team.get("rating", 0),
-                "WR%": recent.get("winrate", 0),
-                "Wins": recent.get("wins", 0),
-                "Losses": recent.get("losses", 0),
-                "Avg Min": recent.get('avg_duration_min', 0)
-            })
+        if MODULES_AVAILABLE:
+            tracker = get_tracker()
+        else:
+            tracker = None
         
-        if stats_data:
-            import pandas as pd
-            df = pd.DataFrame(stats_data)
-            df = df.sort_values("Rating", ascending=False)
-            st.dataframe(df, use_container_width=True)
+        # Register new odds
+        st.markdown("##### ➕ Registrar Nova Odd")
+        
+        team_names = [t.get("name") for t in teams]
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            odds_team_a = st.selectbox("Time A", team_names, key="odds_a")
+            odds_value_a = st.number_input("Odd Time A", min_value=1.01, value=1.50, step=0.01, key="val_a")
+        with col2:
+            odds_team_b = st.selectbox("Time B", [t for t in team_names if t != odds_team_a], key="odds_b")
+            odds_value_b = st.number_input("Odd Time B", min_value=1.01, value=2.50, step=0.01, key="val_b")
+        
+        bookmaker = st.selectbox("Casa de Apostas", ["bet365", "Betano", "Betfair", "Pinnacle", "1xBet", "Rivalry", "GG.bet", "Stake"], key="bm")
+        
+        if st.button("💾 Salvar Odds"):
+            if tracker:
+                match_id = f"{odds_team_a}_vs_{odds_team_b}_{datetime.now().strftime('%Y%m%d')}"
+                result = tracker.register_odds(
+                    match_id, odds_team_a, odds_team_b, 
+                    bookmaker, odds_value_a, odds_value_b,
+                    datetime.now().strftime("%Y-%m-%d")
+                )
+                st.success(f"✅ Odds salvas! Implied: {result['odds']['implied_a']:.1f}% / {result['odds']['implied_b']:.1f}%")
+            else:
+                st.warning("⚠️ Tracker não disponível")
+        
+        st.markdown("---")
+        
+        # Value calculator
+        st.markdown("##### 🎯 Calculadora de Value")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            prob_a = st.slider("Sua probabilidade (%)", 0, 100, 55, key="prob_calc")
+        with col2:
+            odd_a = st.number_input("Odd disponível", min_value=1.01, value=1.80, step=0.01, key="odd_calc")
+        with col3:
+            implied = 100 / odd_a
+            value = prob_a - implied
+            kelly = calculate_kelly(prob_a, odd_a) if MODULES_AVAILABLE else 0
+            
+            if value > 0:
+                st.success(f"✅ VALUE: +{value:.1f}%")
+                st.caption(f"Kelly: {kelly:.1f}% da banca")
+            else:
+                st.error(f"❌ No Value: {value:.1f}%")
+    
+    # TAB 5 - DRAFT ANALYZER
+    with tab5:
+        st.subheader("🎯 Analisador de Draft")
+        
+        st.markdown("##### Insira os picks de cada time")
+        
+        col1, col2 = st.columns(2)
+        
+        # Common heroes for autocomplete
+        hero_options = [
+            "Faceless Void", "Phantom Assassin", "Morphling", "Terrorblade", "Medusa",
+            "Invoker", "Storm Spirit", "Queen of Pain", "Ember Spirit", "Leshrac",
+            "Mars", "Axe", "Tidehunter", "Enigma", "Sand King",
+            "Crystal Maiden", "Lion", "Shadow Shaman", "Oracle", "Io",
+            "Earth Spirit", "Tusk", "Rubick", "Snapfire", "Marci"
+        ]
+        
+        with col1:
+            st.markdown("**Radiant Picks**")
+            rad_1 = st.selectbox("Pick 1", hero_options, key="rad1")
+            rad_2 = st.selectbox("Pick 2", hero_options, key="rad2", index=1)
+            rad_3 = st.selectbox("Pick 3", hero_options, key="rad3", index=2)
+            rad_4 = st.selectbox("Pick 4", hero_options, key="rad4", index=3)
+            rad_5 = st.selectbox("Pick 5", hero_options, key="rad5", index=4)
+        
+        with col2:
+            st.markdown("**Dire Picks**")
+            dire_1 = st.selectbox("Pick 1", hero_options, key="dire1", index=5)
+            dire_2 = st.selectbox("Pick 2", hero_options, key="dire2", index=6)
+            dire_3 = st.selectbox("Pick 3", hero_options, key="dire3", index=7)
+            dire_4 = st.selectbox("Pick 4", hero_options, key="dire4", index=8)
+            dire_5 = st.selectbox("Pick 5", hero_options, key="dire5", index=9)
+        
+        if st.button("🔍 Analisar Draft"):
+            radiant = [rad_1, rad_2, rad_3, rad_4, rad_5]
+            dire = [dire_1, dire_2, dire_3, dire_4, dire_5]
+            
+            if MODULES_AVAILABLE:
+                analysis = analyze_draft(radiant, dire)
+                
+                st.markdown("---")
+                st.markdown("### 📊 Resultado da Análise")
+                
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    winner = analysis.get("predicted_winner", "Toss-up")
+                    st.metric("🏆 Draft Winner", winner)
+                with col2:
+                    prob = analysis.get("win_probability", {})
+                    st.metric("Radiant %", f"{prob.get('radiant', 50)}%")
+                with col3:
+                    st.metric("Dire %", f"{prob.get('dire', 50)}%")
+                
+                # Detailed breakdown
+                st.markdown("##### 📈 Comparação de Scores")
+                comparison = analysis.get("comparison", {})
+                for metric, data in comparison.items():
+                    col1, col2, col3 = st.columns([1, 2, 1])
+                    with col1:
+                        st.caption(metric.capitalize())
+                    with col2:
+                        rad_score = data.get('radiant', 0)
+                        dire_score = data.get('dire', 0)
+                        st.progress(rad_score / 10)
+                        st.caption(f"R: {rad_score} | D: {dire_score}")
+                    with col3:
+                        st.write(data.get('advantage', 'Even'))
+                
+                # Game prediction
+                game_pred = analysis.get("game_prediction", {})
+                st.markdown("##### 🎮 Previsão do Jogo")
+                st.write(f"⏱️ Duração: **{game_pred.get('predicted_duration', 'N/A')}**")
+                st.write(f"💀 Kills: **{game_pred.get('kill_prediction', 'N/A')}**")
+                st.write(f"🏰 Objetivos: **{game_pred.get('objective_control', 'N/A')}**")
+            else:
+                st.warning("⚠️ Draft Analyzer não disponível")
+    
+    # TAB 6 - NOTIFICAÇÕES
+    with tab6:
+        st.subheader("📧 Configuração de Notificações")
+        
+        st.markdown("""
+        ##### 📬 Emails Configurados
+        - moises.costa12345@gmail.com
+        - gabrielol2035@gmail.com
+        """)
+        
+        st.markdown("---")
+        
+        st.markdown("##### ⚙️ Configurações")
+        
+        daily_email = st.checkbox("📅 Email diário com partidas (6:00 BRT)", value=True)
+        report_2h = st.checkbox("📊 Relatório PDF 2h antes de cada série", value=True)
+        live_alert = st.checkbox("🔴 Alerta quando partida começar", value=True)
+        
+        st.markdown("---")
+        
+        st.markdown("##### 🤖 Análise Multi-AI")
+        st.info("""
+        Para relatórios importantes, usamos consenso de múltiplos modelos:
+        - **Gemini 2.5 Pro** - Análise estratégica e meta
+        - **GPT-4o** - Padrões estatísticos e previsões
+        - **Claude Opus 4** - Síntese e relatório final
+        """)
+        
+        # SMTP Config (sensitive - should be in secrets)
+        with st.expander("🔧 Configuração SMTP (Avançado)"):
+            st.text_input("SMTP Server", value="smtp.gmail.com", disabled=True)
+            st.text_input("SMTP Port", value="587", disabled=True)
+            st.caption("⚠️ Configure as credenciais no arquivo .env ou Streamlit Secrets")
+
 
 def render_pro_teams():
     """Render Pro Teams page."""

@@ -31,11 +31,11 @@ Write-Host "   URL: http://localhost:8501" -ForegroundColor White
 Write-Host "   Para parar: Ctrl+C" -ForegroundColor Gray
 Write-Host ""
 
-# Mudar para pasta Legacy e rodar
-Set-Location "$projectRoot\Legacy"
+# Rodar da raiz do projeto
+Set-Location "$projectRoot"
 
 # Abrir navegador
 Start-Process "http://localhost:8501"
 
 # Rodar Streamlit
-& "$projectRoot\.venv\Scripts\python.exe" -m streamlit run src\ui\app.py --server.port 8501
+& "$projectRoot\.venv\Scripts\python.exe" -m streamlit run app.py --server.port 8501
