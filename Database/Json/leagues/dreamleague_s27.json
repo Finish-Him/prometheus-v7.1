@@ -1,0 +1,1213 @@
+{
+  "$schema": "prometheus_league_v2",
+  "version": "2.0.0",
+  "last_updated": "2025-12-10T00:00:00Z",
+  "tournament": {
+    "id": "dreamleague_s27",
+    "opendota_league_id": null,
+    "name": "DreamLeague Season 27",
+    "tier": 1,
+    "prize_pool": 1000000,
+    "currency": "USD",
+    "start_date": "2025-12-09",
+    "end_date": "2025-12-20",
+    "location": "Stockholm, Sweden",
+    "organizer": "DreamHack",
+    "stream": {
+      "twitch": "https://twitch.tv/dreamleague",
+      "youtube": "https://youtube.com/dreamleague"
+    },
+    "format": {
+      "group_stage": {
+        "type": "Swiss System",
+        "format": "Bo3",
+        "teams": 24,
+        "rounds": 5,
+        "advance_to_playoffs": 8,
+        "eliminated": 8
+      },
+      "playoffs": {
+        "type": "Double Elimination",
+        "format_upper": "Bo3",
+        "format_lower": "Bo3",
+        "format_finals": "Bo5",
+        "teams": 8
+      }
+    }
+  },
+  "teams": [
+    {
+      "id": "team_falcons",
+      "team_id": 9247354,
+      "name": "Team Falcons",
+      "tag": "FLCN",
+      "region": "MENA",
+      "tier": "S",
+      "seed": "Invited",
+      "ranking": 1,
+      "roster": [
+        {
+          "name": "skiter",
+          "role": "carry",
+          "position": 1,
+          "account_id": null
+        },
+        {
+          "name": "Malr1ne",
+          "role": "mid",
+          "position": 2,
+          "account_id": null
+        },
+        {
+          "name": "ATF",
+          "role": "offlane",
+          "position": 3,
+          "account_id": null
+        },
+        {
+          "name": "Cr1t-",
+          "role": "support",
+          "position": 4,
+          "account_id": null
+        },
+        {
+          "name": "Sneyking",
+          "role": "support",
+          "position": 5,
+          "account_id": null
+        }
+      ],
+      "coach": "Aui_2000"
+    },
+    {
+      "id": "xtreme_gaming",
+      "team_id": 8599101,
+      "name": "Xtreme Gaming",
+      "tag": "XG",
+      "region": "China",
+      "tier": "S",
+      "seed": "Invited",
+      "ranking": 2,
+      "roster": [
+        {
+          "name": "Ame",
+          "role": "carry",
+          "position": 1,
+          "account_id": null
+        },
+        {
+          "name": "NothingToSay",
+          "role": "mid",
+          "position": 2,
+          "account_id": null
+        },
+        {
+          "name": "Xxs",
+          "role": "offlane",
+          "position": 3,
+          "account_id": null
+        },
+        {
+          "name": "fy",
+          "role": "support",
+          "position": 4,
+          "account_id": null
+        },
+        {
+          "name": "xNova",
+          "role": "support",
+          "position": 5,
+          "account_id": null
+        }
+      ],
+      "coach": null
+    },
+    {
+      "id": "team_spirit",
+      "team_id": 7119388,
+      "name": "Team Spirit",
+      "tag": "TS",
+      "region": "CIS",
+      "tier": "S",
+      "seed": "Invited",
+      "ranking": 3,
+      "roster": [
+        {
+          "name": "Yatoro",
+          "role": "carry",
+          "position": 1,
+          "account_id": 321580662
+        },
+        {
+          "name": "Larl",
+          "role": "mid",
+          "position": 2,
+          "account_id": null
+        },
+        {
+          "name": "Collapse",
+          "role": "offlane",
+          "position": 3,
+          "account_id": null
+        },
+        {
+          "name": "Mira",
+          "role": "support",
+          "position": 4,
+          "account_id": null
+        },
+        {
+          "name": "Miposhka",
+          "role": "support",
+          "position": 5,
+          "account_id": null
+        }
+      ],
+      "coach": "Silent"
+    },
+    {
+      "id": "team_liquid",
+      "team_id": 2163,
+      "name": "Team Liquid",
+      "tag": "Liquid",
+      "region": "EU",
+      "tier": "S",
+      "seed": "Invited",
+      "ranking": 4,
+      "roster": [
+        {
+          "name": "miCKe",
+          "role": "carry",
+          "position": 1,
+          "account_id": null
+        },
+        {
+          "name": "Nisha",
+          "role": "mid",
+          "position": 2,
+          "account_id": null
+        },
+        {
+          "name": "zai",
+          "role": "offlane",
+          "position": 3,
+          "account_id": null
+        },
+        {
+          "name": "Boxi",
+          "role": "support",
+          "position": 4,
+          "account_id": null
+        },
+        {
+          "name": "Insania",
+          "role": "support",
+          "position": 5,
+          "account_id": null
+        }
+      ],
+      "coach": "Blitz"
+    },
+    {
+      "id": "tundra_esports",
+      "team_id": 8291895,
+      "name": "Tundra Esports",
+      "tag": "Tundra",
+      "region": "EU",
+      "tier": "S",
+      "seed": "Invited",
+      "ranking": 5,
+      "roster": [
+        {
+          "name": "Pure",
+          "role": "carry",
+          "position": 1,
+          "account_id": null
+        },
+        {
+          "name": "bzm",
+          "role": "mid",
+          "position": 2,
+          "account_id": null
+        },
+        {
+          "name": "33",
+          "role": "offlane",
+          "position": 3,
+          "account_id": null
+        },
+        {
+          "name": "Saksa",
+          "role": "support",
+          "position": 4,
+          "account_id": null
+        },
+        {
+          "name": "Whitemon",
+          "role": "support",
+          "position": 5,
+          "account_id": null
+        }
+      ],
+      "coach": "Aui_2000"
+    },
+    {
+      "id": "betboom_team",
+      "team_id": 8255888,
+      "name": "BetBoom Team",
+      "tag": "BB",
+      "region": "CIS",
+      "tier": "A",
+      "seed": "Invited",
+      "ranking": 6,
+      "roster": [
+        {
+          "name": "Kiritych~",
+          "role": "carry",
+          "position": 1,
+          "account_id": null
+        },
+        {
+          "name": "gpk~",
+          "role": "mid",
+          "position": 2,
+          "account_id": null
+        },
+        {
+          "name": "MieRo",
+          "role": "offlane",
+          "position": 3,
+          "account_id": null
+        },
+        {
+          "name": "Save-",
+          "role": "support",
+          "position": 4,
+          "account_id": null
+        },
+        {
+          "name": "Kataomi",
+          "role": "support",
+          "position": 5,
+          "account_id": null
+        }
+      ],
+      "coach": null
+    },
+    {
+      "id": "parivision",
+      "team_id": 9824702,
+      "name": "PARIVISION",
+      "tag": "PV",
+      "region": "CIS",
+      "tier": "A",
+      "seed": "Invited",
+      "ranking": 7,
+      "roster": [
+        {
+          "name": "Satanic",
+          "role": "carry",
+          "position": 1,
+          "account_id": null
+        },
+        {
+          "name": "No[o]ne-",
+          "role": "mid",
+          "position": 2,
+          "account_id": null
+        },
+        {
+          "name": "DM",
+          "role": "offlane",
+          "position": 3,
+          "account_id": null
+        },
+        {
+          "name": "Fng",
+          "role": "support",
+          "position": 4,
+          "account_id": null
+        },
+        {
+          "name": "Dukalis",
+          "role": "support",
+          "position": 5,
+          "account_id": null
+        }
+      ],
+      "coach": null
+    },
+    {
+      "id": "heroic",
+      "team_id": 9303484,
+      "name": "HEROIC",
+      "tag": "HEROIC",
+      "region": "SA",
+      "tier": "A",
+      "seed": "Invited",
+      "ranking": 8,
+      "roster": [
+        {
+          "name": "Yuma",
+          "role": "carry",
+          "position": 1,
+          "account_id": null
+        },
+        {
+          "name": "Wisper",
+          "role": "mid",
+          "position": 2,
+          "account_id": null
+        },
+        {
+          "name": "Davai Lansen",
+          "role": "offlane",
+          "position": 3,
+          "account_id": null
+        },
+        {
+          "name": "Scofield",
+          "role": "support",
+          "position": 4,
+          "account_id": null
+        },
+        {
+          "name": "KJ",
+          "role": "support",
+          "position": 5,
+          "account_id": null
+        }
+      ],
+      "coach": null
+    },
+    {
+      "id": "nigma_galaxy",
+      "team_id": 7554697,
+      "name": "Nigma Galaxy",
+      "tag": "NGX",
+      "region": "MENA",
+      "tier": "A",
+      "seed": "Invited",
+      "ranking": 9,
+      "roster": [
+        {
+          "name": "TA2000",
+          "role": "carry",
+          "position": 1,
+          "account_id": null
+        },
+        {
+          "name": "SumaiL",
+          "role": "mid",
+          "position": 2,
+          "account_id": 111620041
+        },
+        {
+          "name": "No!ob",
+          "role": "offlane",
+          "position": 3,
+          "account_id": null
+        },
+        {
+          "name": "OmaR",
+          "role": "support",
+          "position": 4,
+          "account_id": null
+        },
+        {
+          "name": "GH",
+          "role": "support",
+          "position": 5,
+          "account_id": null
+        }
+      ],
+      "coach": "Kuroky"
+    },
+    {
+      "id": "og",
+      "team_id": 2586976,
+      "name": "OG",
+      "tag": "OG",
+      "region": "SEA",
+      "tier": "A",
+      "seed": "Invited",
+      "ranking": 10,
+      "roster": [
+        {
+          "name": "Natsumi",
+          "role": "carry",
+          "position": 1,
+          "account_id": null
+        },
+        {
+          "name": "Yopaj",
+          "role": "mid",
+          "position": 2,
+          "account_id": null
+        },
+        {
+          "name": "Tims",
+          "role": "offlane",
+          "position": 3,
+          "account_id": null
+        },
+        {
+          "name": "skem",
+          "role": "support",
+          "position": 4,
+          "account_id": null
+        },
+        {
+          "name": "Dj",
+          "role": "support",
+          "position": 5,
+          "account_id": null
+        }
+      ],
+      "coach": null
+    },
+    {
+      "id": "aurora_gaming",
+      "team_id": 9467224,
+      "name": "Aurora Gaming",
+      "tag": "Aurora",
+      "region": "CIS",
+      "tier": "A",
+      "seed": "Invited",
+      "ranking": 11,
+      "roster": [
+        {
+          "name": "Nightfall",
+          "role": "carry",
+          "position": 1,
+          "account_id": null
+        },
+        {
+          "name": "TORONTOTOKYO",
+          "role": "mid",
+          "position": 2,
+          "account_id": null
+        },
+        {
+          "name": "Mira",
+          "role": "offlane",
+          "position": 3,
+          "account_id": null
+        },
+        {
+          "name": "Solo",
+          "role": "support",
+          "position": 4,
+          "account_id": null
+        },
+        {
+          "name": "Oli~",
+          "role": "support",
+          "position": 5,
+          "account_id": null
+        }
+      ],
+      "coach": null
+    },
+    {
+      "id": "natus_vincere",
+      "team_id": 36,
+      "name": "Natus Vincere",
+      "tag": "NaVi",
+      "region": "EU",
+      "tier": "A",
+      "seed": "Invited",
+      "ranking": 12,
+      "roster": [
+        {
+          "name": "Yuragi",
+          "role": "carry",
+          "position": 1,
+          "account_id": null
+        },
+        {
+          "name": "bzm",
+          "role": "mid",
+          "position": 2,
+          "account_id": null
+        },
+        {
+          "name": "Ceb",
+          "role": "offlane",
+          "position": 3,
+          "account_id": null
+        },
+        {
+          "name": "Taiga",
+          "role": "support",
+          "position": 4,
+          "account_id": null
+        },
+        {
+          "name": "Fly",
+          "role": "support",
+          "position": 5,
+          "account_id": null
+        }
+      ],
+      "coach": null
+    },
+    {
+      "id": "virtus_pro",
+      "team_id": 1883502,
+      "name": "Virtus.pro",
+      "tag": "VP",
+      "region": "EU",
+      "tier": "B",
+      "seed": "Qualified",
+      "ranking": 13,
+      "roster": [
+        {
+          "name": "Cooman",
+          "role": "carry",
+          "position": 1,
+          "account_id": null
+        },
+        {
+          "name": "squad1x",
+          "role": "mid",
+          "position": 2,
+          "account_id": null
+        },
+        {
+          "name": "Noticed",
+          "role": "offlane",
+          "position": 3,
+          "account_id": null
+        },
+        {
+          "name": "Yamich",
+          "role": "support",
+          "position": 4,
+          "account_id": null
+        },
+        {
+          "name": "JEEMZZ",
+          "role": "support",
+          "position": 5,
+          "account_id": null
+        }
+      ],
+      "coach": null
+    },
+    {
+      "id": "mouz",
+      "team_id": 9338413,
+      "name": "MOUZ",
+      "tag": "MOUZ",
+      "region": "EU",
+      "tier": "B",
+      "seed": "Qualified",
+      "ranking": 14,
+      "roster": [
+        {
+          "name": "dyrachyo",
+          "role": "carry",
+          "position": 1,
+          "account_id": null
+        },
+        {
+          "name": "Stormstormer",
+          "role": "mid",
+          "position": 2,
+          "account_id": null
+        },
+        {
+          "name": "JQBZZ",
+          "role": "offlane",
+          "position": 3,
+          "account_id": null
+        },
+        {
+          "name": "ponlo",
+          "role": "support",
+          "position": 4,
+          "account_id": null
+        },
+        {
+          "name": "Tobi",
+          "role": "support",
+          "position": 5,
+          "account_id": null
+        }
+      ],
+      "coach": null
+    },
+    {
+      "id": "gamerlegion",
+      "team_id": null,
+      "name": "GamerLegion",
+      "tag": "GL",
+      "region": "NA",
+      "tier": "B",
+      "seed": "Qualified",
+      "ranking": 15,
+      "roster": [
+        {
+          "name": "Player1",
+          "role": "carry",
+          "position": 1,
+          "account_id": null
+        },
+        {
+          "name": "Player2",
+          "role": "mid",
+          "position": 2,
+          "account_id": null
+        },
+        {
+          "name": "Player3",
+          "role": "offlane",
+          "position": 3,
+          "account_id": null
+        },
+        {
+          "name": "Player4",
+          "role": "support",
+          "position": 4,
+          "account_id": null
+        },
+        {
+          "name": "Player5",
+          "role": "support",
+          "position": 5,
+          "account_id": null
+        }
+      ],
+      "coach": null
+    },
+    {
+      "id": "amaru_gaming",
+      "team_id": null,
+      "name": "Amaru Gaming",
+      "tag": "Amaru",
+      "region": "SA",
+      "tier": "B",
+      "seed": "Qualified",
+      "ranking": 16,
+      "roster": [
+        {
+          "name": "Player1",
+          "role": "carry",
+          "position": 1,
+          "account_id": null
+        },
+        {
+          "name": "Player2",
+          "role": "mid",
+          "position": 2,
+          "account_id": null
+        },
+        {
+          "name": "Player3",
+          "role": "offlane",
+          "position": 3,
+          "account_id": null
+        },
+        {
+          "name": "Player4",
+          "role": "support",
+          "position": 4,
+          "account_id": null
+        },
+        {
+          "name": "Player5",
+          "role": "support",
+          "position": 5,
+          "account_id": null
+        }
+      ],
+      "coach": null
+    },
+    {
+      "id": "runa_team",
+      "team_id": null,
+      "name": "Runa Team",
+      "tag": "Runa",
+      "region": "CIS",
+      "tier": "B",
+      "seed": "Qualified",
+      "ranking": 17,
+      "roster": [
+        {
+          "name": "Player1",
+          "role": "carry",
+          "position": 1,
+          "account_id": null
+        },
+        {
+          "name": "Player2",
+          "role": "mid",
+          "position": 2,
+          "account_id": null
+        },
+        {
+          "name": "Player3",
+          "role": "offlane",
+          "position": 3,
+          "account_id": null
+        },
+        {
+          "name": "Player4",
+          "role": "support",
+          "position": 4,
+          "account_id": null
+        },
+        {
+          "name": "Player5",
+          "role": "support",
+          "position": 5,
+          "account_id": null
+        }
+      ],
+      "coach": null
+    },
+    {
+      "id": "yakult_brothers",
+      "team_id": null,
+      "name": "Yakult Brothers",
+      "tag": "YB",
+      "region": "China",
+      "tier": "B",
+      "seed": "Qualified",
+      "ranking": 18,
+      "roster": [
+        {
+          "name": "Player1",
+          "role": "carry",
+          "position": 1,
+          "account_id": null
+        },
+        {
+          "name": "Player2",
+          "role": "mid",
+          "position": 2,
+          "account_id": null
+        },
+        {
+          "name": "Player3",
+          "role": "offlane",
+          "position": 3,
+          "account_id": null
+        },
+        {
+          "name": "Player4",
+          "role": "support",
+          "position": 4,
+          "account_id": null
+        },
+        {
+          "name": "Player5",
+          "role": "support",
+          "position": 5,
+          "account_id": null
+        }
+      ],
+      "coach": null
+    },
+    {
+      "id": "team_nemesis",
+      "team_id": null,
+      "name": "Team Nemesis",
+      "tag": "Nemesis",
+      "region": "SEA",
+      "tier": "B",
+      "seed": "Qualified",
+      "ranking": 19,
+      "roster": [
+        {
+          "name": "Player1",
+          "role": "carry",
+          "position": 1,
+          "account_id": null
+        },
+        {
+          "name": "Player2",
+          "role": "mid",
+          "position": 2,
+          "account_id": null
+        },
+        {
+          "name": "Player3",
+          "role": "offlane",
+          "position": 3,
+          "account_id": null
+        },
+        {
+          "name": "Player4",
+          "role": "support",
+          "position": 4,
+          "account_id": null
+        },
+        {
+          "name": "Player5",
+          "role": "support",
+          "position": 5,
+          "account_id": null
+        }
+      ],
+      "coach": null
+    },
+    {
+      "id": "team_yandex",
+      "team_id": null,
+      "name": "Team Yandex",
+      "tag": "Yandex",
+      "region": "EU",
+      "tier": "C",
+      "seed": "Qualified",
+      "ranking": 20,
+      "roster": [
+        {
+          "name": "Player1",
+          "role": "carry",
+          "position": 1,
+          "account_id": null
+        },
+        {
+          "name": "Player2",
+          "role": "mid",
+          "position": 2,
+          "account_id": null
+        },
+        {
+          "name": "Player3",
+          "role": "offlane",
+          "position": 3,
+          "account_id": null
+        },
+        {
+          "name": "Player4",
+          "role": "support",
+          "position": 4,
+          "account_id": null
+        },
+        {
+          "name": "Player5",
+          "role": "support",
+          "position": 5,
+          "account_id": null
+        }
+      ],
+      "coach": null
+    },
+    {
+      "id": "1win_team",
+      "team_id": null,
+      "name": "1win Team",
+      "tag": "1win",
+      "region": "CIS",
+      "tier": "C",
+      "seed": "Qualified",
+      "ranking": 21,
+      "roster": [
+        {
+          "name": "Player1",
+          "role": "carry",
+          "position": 1,
+          "account_id": null
+        },
+        {
+          "name": "Player2",
+          "role": "mid",
+          "position": 2,
+          "account_id": null
+        },
+        {
+          "name": "Player3",
+          "role": "offlane",
+          "position": 3,
+          "account_id": null
+        },
+        {
+          "name": "Player4",
+          "role": "support",
+          "position": 4,
+          "account_id": null
+        },
+        {
+          "name": "Player5",
+          "role": "support",
+          "position": 5,
+          "account_id": null
+        }
+      ],
+      "coach": null
+    },
+    {
+      "id": "pipsqueak_4",
+      "team_id": null,
+      "name": "Pipsqueak+4",
+      "tag": "P+4",
+      "region": "EU",
+      "tier": "C",
+      "seed": "Qualified",
+      "ranking": 22,
+      "roster": [
+        {
+          "name": "Player1",
+          "role": "carry",
+          "position": 1,
+          "account_id": null
+        },
+        {
+          "name": "Player2",
+          "role": "mid",
+          "position": 2,
+          "account_id": null
+        },
+        {
+          "name": "Player3",
+          "role": "offlane",
+          "position": 3,
+          "account_id": null
+        },
+        {
+          "name": "Player4",
+          "role": "support",
+          "position": 4,
+          "account_id": null
+        },
+        {
+          "name": "Player5",
+          "role": "support",
+          "position": 5,
+          "account_id": null
+        }
+      ],
+      "coach": null
+    },
+    {
+      "id": "passion_ua",
+      "team_id": null,
+      "name": "Passion UA",
+      "tag": "PUA",
+      "region": "EU",
+      "tier": "C",
+      "seed": "Qualified",
+      "ranking": 23,
+      "roster": [
+        {
+          "name": "Player1",
+          "role": "carry",
+          "position": 1,
+          "account_id": null
+        },
+        {
+          "name": "Player2",
+          "role": "mid",
+          "position": 2,
+          "account_id": null
+        },
+        {
+          "name": "Player3",
+          "role": "offlane",
+          "position": 3,
+          "account_id": null
+        },
+        {
+          "name": "Player4",
+          "role": "support",
+          "position": 4,
+          "account_id": null
+        },
+        {
+          "name": "Player5",
+          "role": "support",
+          "position": 5,
+          "account_id": null
+        }
+      ],
+      "coach": null
+    },
+    {
+      "id": "team_tidebound",
+      "team_id": null,
+      "name": "Team Tidebound",
+      "tag": "Tide",
+      "region": "EU",
+      "tier": "C",
+      "seed": "Qualified",
+      "ranking": 24,
+      "roster": [
+        {
+          "name": "Player1",
+          "role": "carry",
+          "position": 1,
+          "account_id": null
+        },
+        {
+          "name": "Player2",
+          "role": "mid",
+          "position": 2,
+          "account_id": null
+        },
+        {
+          "name": "Player3",
+          "role": "offlane",
+          "position": 3,
+          "account_id": null
+        },
+        {
+          "name": "Player4",
+          "role": "support",
+          "position": 4,
+          "account_id": null
+        },
+        {
+          "name": "Player5",
+          "role": "support",
+          "position": 5,
+          "account_id": null
+        }
+      ],
+      "coach": null
+    }
+  ],
+  "schedule": {
+    "round_1": {
+      "date": "2025-12-10",
+      "matches": [
+        {
+          "id": "dl27_r1_001",
+          "time_cet": "08:00",
+          "time_brt": "04:00",
+          "team_a": "Team Liquid",
+          "team_b": "Team Nemesis",
+          "format": "Bo3",
+          "status": "scheduled",
+          "result": null,
+          "stream": "https://twitch.tv/dreamleague"
+        },
+        {
+          "id": "dl27_r1_002",
+          "time_cet": "08:00",
+          "time_brt": "04:00",
+          "team_a": "Team Spirit",
+          "team_b": "1win Team",
+          "format": "Bo3",
+          "status": "scheduled",
+          "result": null,
+          "stream": "https://twitch.tv/dreamleague2"
+        },
+        {
+          "id": "dl27_r1_003",
+          "time_cet": "08:00",
+          "time_brt": "04:00",
+          "team_a": "OG",
+          "team_b": "Team Tidebound",
+          "format": "Bo3",
+          "status": "scheduled",
+          "result": null,
+          "stream": "https://twitch.tv/dreamleague3"
+        },
+        {
+          "id": "dl27_r1_004",
+          "time_cet": "11:00",
+          "time_brt": "07:00",
+          "team_a": "Team Falcons",
+          "team_b": "Passion UA",
+          "format": "Bo3",
+          "status": "scheduled",
+          "result": null,
+          "stream": "https://twitch.tv/dreamleague"
+        },
+        {
+          "id": "dl27_r1_005",
+          "time_cet": "11:00",
+          "time_brt": "07:00",
+          "team_a": "Tundra Esports",
+          "team_b": "Amaru Gaming",
+          "format": "Bo3",
+          "status": "scheduled",
+          "result": null,
+          "stream": "https://twitch.tv/dreamleague2"
+        },
+        {
+          "id": "dl27_r1_006",
+          "time_cet": "11:00",
+          "time_brt": "07:00",
+          "team_a": "MOUZ",
+          "team_b": "Pipsqueak+4",
+          "format": "Bo3",
+          "status": "scheduled",
+          "result": null,
+          "stream": "https://twitch.tv/dreamleague3"
+        },
+        {
+          "id": "dl27_r1_007",
+          "time_cet": "14:00",
+          "time_brt": "10:00",
+          "team_a": "BetBoom Team",
+          "team_b": "Runa Team",
+          "format": "Bo3",
+          "status": "scheduled",
+          "result": null,
+          "stream": "https://twitch.tv/dreamleague"
+        },
+        {
+          "id": "dl27_r1_008",
+          "time_cet": "14:00",
+          "time_brt": "10:00",
+          "team_a": "PARIVISION",
+          "team_b": "GamerLegion",
+          "format": "Bo3",
+          "status": "scheduled",
+          "result": null,
+          "stream": "https://twitch.tv/dreamleague2"
+        },
+        {
+          "id": "dl27_r1_009",
+          "time_cet": "14:00",
+          "time_brt": "10:00",
+          "team_a": "Team Yandex",
+          "team_b": "Virtus.pro",
+          "format": "Bo3",
+          "status": "scheduled",
+          "result": null,
+          "stream": "https://twitch.tv/dreamleague3"
+        },
+        {
+          "id": "dl27_r1_010",
+          "time_cet": "17:00",
+          "time_brt": "13:00",
+          "team_a": "HEROIC",
+          "team_b": "Yakult Brothers",
+          "format": "Bo3",
+          "status": "scheduled",
+          "result": null,
+          "stream": "https://twitch.tv/dreamleague"
+        },
+        {
+          "id": "dl27_r1_011",
+          "time_cet": "17:00",
+          "time_brt": "13:00",
+          "team_a": "Xtreme Gaming",
+          "team_b": "Nigma Galaxy",
+          "format": "Bo3",
+          "status": "scheduled",
+          "result": null,
+          "stream": "https://twitch.tv/dreamleague2"
+        },
+        {
+          "id": "dl27_r1_012",
+          "time_cet": "17:00",
+          "time_brt": "13:00",
+          "team_a": "Aurora Gaming",
+          "team_b": "Natus Vincere",
+          "format": "Bo3",
+          "status": "scheduled",
+          "result": null,
+          "stream": "https://twitch.tv/dreamleague3"
+        }
+      ]
+    }
+  },
+  "predictions": {},
+  "head_to_head": {}
+}

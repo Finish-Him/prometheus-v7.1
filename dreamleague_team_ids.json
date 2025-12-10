@@ -1,0 +1,30 @@
+{
+  "found": {
+    "Team Falcons": 9247354,
+    "Xtreme Gaming": 8599101,
+    "Team Spirit": 7119388,
+    "Team Liquid": 2163,
+    "Tundra Esports": 8291895,
+    "BetBoom Team": 8255888,
+    "PARIVISION": 9824702,
+    "HEROIC": 9303484,
+    "Nigma Galaxy": 7554697,
+    "OG": 2586976,
+    "Aurora Gaming": 9467224,
+    "Natus Vincere": 36,
+    "Virtus.pro": 1883502,
+    "MOUZ": 9338413
+  },
+  "not_found": [
+    "GamerLegion",
+    "Amaru Gaming",
+    "Runa Team",
+    "Yakult Brothers",
+    "Team Nemesis",
+    "Team Yandex",
+    "1win Team",
+    "Pipsqueak+4",
+    "Passion UA",
+    "Team Tidebound"
+  ]
+}

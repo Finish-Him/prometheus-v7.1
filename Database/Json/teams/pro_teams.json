@@ -1,0 +1,1226 @@
+{
+  "$schema": "prometheus_teams_v2",
+  "version": "2.0.0",
+  "last_updated": "2025-12-10T02:32:04.312107",
+  "tournament": "dreamleague_s27",
+  "teams": [
+    {
+      "team_id": 9247354,
+      "name": "Team Falcons",
+      "tag": "FLCN",
+      "logo_url": "https://cdn.steamusercontent.com/ugc/2314350571781870059/2B5C9FE9BA0A2DC303A13261444532AA08352843/",
+      "rating": 1571.62,
+      "all_time_wins": 469,
+      "all_time_losses": 227,
+      "last_match_time": 1765005849,
+      "current_roster": [
+        {
+          "account_id": 183719386,
+          "name": "AMMAR_THE_F",
+          "games_played": 668,
+          "wins": 441,
+          "winrate": 66.0
+        },
+        {
+          "account_id": 25907144,
+          "name": "Cr1t-",
+          "games_played": 668,
+          "wins": 441,
+          "winrate": 66.0
+        },
+        {
+          "account_id": 10366616,
+          "name": "Sneyking",
+          "games_played": 663,
+          "wins": 436,
+          "winrate": 65.8
+        },
+        {
+          "account_id": 100058342,
+          "name": "skiter",
+          "games_played": 663,
+          "wins": 436,
+          "winrate": 65.8
+        },
+        {
+          "account_id": 898455820,
+          "name": "Malr1ne",
+          "games_played": 616,
+          "wins": 414,
+          "winrate": 67.2
+        }
+      ],
+      "recent_stats": {
+        "matches": 100,
+        "wins": 72,
+        "losses": 28,
+        "winrate": 72.0,
+        "avg_duration_sec": 2627,
+        "avg_duration_min": 43.8
+      },
+      "top_heroes": [
+        {
+          "hero_id": 120,
+          "games": 148,
+          "wins": 91,
+          "winrate": 61.5
+        },
+        {
+          "hero_id": 123,
+          "games": 121,
+          "wins": 78,
+          "winrate": 64.5
+        },
+        {
+          "hero_id": 49,
+          "games": 118,
+          "wins": 81,
+          "winrate": 68.6
+        },
+        {
+          "hero_id": 58,
+          "games": 102,
+          "wins": 69,
+          "winrate": 67.6
+        },
+        {
+          "hero_id": 129,
+          "games": 102,
+          "wins": 73,
+          "winrate": 71.6
+        }
+      ]
+    },
+    {
+      "team_id": 8291895,
+      "name": "Tundra Esports",
+      "tag": "Tundra",
+      "logo_url": "https://cdn.steamusercontent.com/ugc/2031716132171967904/07B168B8063D9B22CDAD53AB421ECAF3D4B2E07E/",
+      "rating": 1570.25,
+      "all_time_wins": 708,
+      "all_time_losses": 441,
+      "last_match_time": 1765103486,
+      "current_roster": [
+        {
+          "account_id": 86698277,
+          "name": "33",
+          "games_played": 913,
+          "wins": 563,
+          "winrate": 61.7
+        },
+        {
+          "account_id": 103735745,
+          "name": "Saksa",
+          "games_played": 654,
+          "wins": 411,
+          "winrate": 62.8
+        },
+        {
+          "account_id": 136829091,
+          "name": "Whitemon",
+          "games_played": 619,
+          "wins": 391,
+          "winrate": 63.2
+        },
+        {
+          "account_id": 100058342,
+          "name": "skiter",
+          "games_played": 501,
+          "wins": 302,
+          "winrate": 60.3
+        },
+        {
+          "account_id": 10366616,
+          "name": "Sneyking",
+          "games_played": 485,
+          "wins": 295,
+          "winrate": 60.8
+        }
+      ],
+      "recent_stats": {
+        "matches": 100,
+        "wins": 60,
+        "losses": 40,
+        "winrate": 60.0,
+        "avg_duration_sec": 2405,
+        "avg_duration_min": 40.1
+      },
+      "top_heroes": [
+        {
+          "hero_id": 69,
+          "games": 179,
+          "wins": 111,
+          "winrate": 62.0
+        },
+        {
+          "hero_id": 38,
+          "games": 145,
+          "wins": 89,
+          "winrate": 61.4
+        },
+        {
+          "hero_id": 65,
+          "games": 131,
+          "wins": 84,
+          "winrate": 64.1
+        },
+        {
+          "hero_id": 120,
+          "games": 114,
+          "wins": 78,
+          "winrate": 68.4
+        },
+        {
+          "hero_id": 19,
+          "games": 112,
+          "wins": 73,
+          "winrate": 65.2
+        }
+      ]
+    },
+    {
+      "team_id": 7119388,
+      "name": "Team Spirit",
+      "tag": "TSpirit",
+      "logo_url": "https://cdn.steamusercontent.com/ugc/1839179120711951766/CD7E0885CB527334205CC7885E9C101B7BC17702/",
+      "rating": 1538.3,
+      "all_time_wins": 817,
+      "all_time_losses": 544,
+      "last_match_time": 1763921777,
+      "current_roster": [
+        {
+          "account_id": 113331514,
+          "name": "Miposhka",
+          "games_played": 1138,
+          "wins": 713,
+          "winrate": 62.7
+        },
+        {
+          "account_id": 321580662,
+          "name": "Yatoro",
+          "games_played": 1087,
+          "wins": 690,
+          "winrate": 63.5
+        },
+        {
+          "account_id": 302214028,
+          "name": "Collapse",
+          "games_played": 1087,
+          "wins": 690,
+          "winrate": 63.5
+        },
+        {
+          "account_id": 106305042,
+          "name": "Larl",
+          "games_played": 825,
+          "wins": 510,
+          "winrate": 61.8
+        },
+        {
+          "account_id": 256156323,
+          "name": "Mira",
+          "games_played": 800,
+          "wins": 503,
+          "winrate": 62.9
+        }
+      ],
+      "recent_stats": {
+        "matches": 100,
+        "wins": 65,
+        "losses": 35,
+        "winrate": 65.0,
+        "avg_duration_sec": 2440,
+        "avg_duration_min": 40.7
+      },
+      "top_heroes": [
+        {
+          "hero_id": 19,
+          "games": 172,
+          "wins": 111,
+          "winrate": 64.5
+        },
+        {
+          "hero_id": 86,
+          "games": 165,
+          "wins": 96,
+          "winrate": 58.2
+        },
+        {
+          "hero_id": 129,
+          "games": 158,
+          "wins": 90,
+          "winrate": 57.0
+        },
+        {
+          "hero_id": 17,
+          "games": 130,
+          "wins": 88,
+          "winrate": 67.7
+        },
+        {
+          "hero_id": 120,
+          "games": 126,
+          "wins": 71,
+          "winrate": 56.3
+        }
+      ]
+    },
+    {
+      "team_id": 9338413,
+      "name": "MOUZ",
+      "tag": "MOUZ",
+      "logo_url": "https://cdn.steamusercontent.com/ugc/14936784213521439739/3EA33A8516BDE538B7963F044CD1B7AB4B0BB60D/",
+      "rating": 1476.83,
+      "all_time_wins": 340,
+      "all_time_losses": 290,
+      "last_match_time": 1765017529,
+      "current_roster": [
+        {
+          "account_id": 58513047,
+          "name": "Supream^",
+          "games_played": 396,
+          "wins": 207,
+          "winrate": 52.3
+        },
+        {
+          "account_id": 146711951,
+          "name": "Nikko",
+          "games_played": 343,
+          "wins": 178,
+          "winrate": 51.9
+        },
+        {
+          "account_id": 109757023,
+          "name": "Ulnit",
+          "games_played": 297,
+          "wins": 157,
+          "winrate": 52.9
+        },
+        {
+          "account_id": 343084576,
+          "name": "NARMAN",
+          "games_played": 269,
+          "wins": 141,
+          "winrate": 52.4
+        },
+        {
+          "account_id": 48823667,
+          "name": null,
+          "games_played": 259,
+          "wins": 138,
+          "winrate": 53.3
+        }
+      ],
+      "recent_stats": {
+        "matches": 100,
+        "wins": 62,
+        "losses": 38,
+        "winrate": 62.0,
+        "avg_duration_sec": 2234,
+        "avg_duration_min": 37.2
+      },
+      "top_heroes": [
+        {
+          "hero_id": 72,
+          "games": 100,
+          "wins": 52,
+          "winrate": 52.0
+        },
+        {
+          "hero_id": 100,
+          "games": 97,
+          "wins": 59,
+          "winrate": 60.8
+        },
+        {
+          "hero_id": 19,
+          "games": 75,
+          "wins": 40,
+          "winrate": 53.3
+        },
+        {
+          "hero_id": 79,
+          "games": 73,
+          "wins": 46,
+          "winrate": 63.0
+        },
+        {
+          "hero_id": 120,
+          "games": 72,
+          "wins": 33,
+          "winrate": 45.8
+        }
+      ]
+    },
+    {
+      "team_id": 2163,
+      "name": "Team Liquid",
+      "tag": "Liquid",
+      "logo_url": "https://steamcdn-a.akamaihd.net/apps/dota2/images/team_logos/2163.png",
+      "rating": 1455.64,
+      "all_time_wins": 1674,
+      "all_time_losses": 1156,
+      "last_match_time": 1763897576,
+      "current_roster": [
+        {
+          "account_id": 77490514,
+          "name": "Boxi",
+          "games_played": 1477,
+          "wins": 844,
+          "winrate": 57.1
+        },
+        {
+          "account_id": 152962063,
+          "name": "m1CKe",
+          "games_played": 1474,
+          "wins": 845,
+          "winrate": 57.3
+        },
+        {
+          "account_id": 54580962,
+          "name": "Insania ",
+          "games_played": 1422,
+          "wins": 808,
+          "winrate": 56.8
+        },
+        {
+          "account_id": 72312627,
+          "name": null,
+          "games_played": 1022,
+          "wins": 655,
+          "winrate": 64.1
+        },
+        {
+          "account_id": 82262664,
+          "name": "kky",
+          "games_played": 893,
+          "wins": 579,
+          "winrate": 64.8
+        }
+      ],
+      "recent_stats": {
+        "matches": 100,
+        "wins": 51,
+        "losses": 49,
+        "winrate": 51.0,
+        "avg_duration_sec": 2425,
+        "avg_duration_min": 40.4
+      },
+      "top_heroes": [
+        {
+          "hero_id": 86,
+          "games": 380,
+          "wins": 225,
+          "winrate": 59.2
+        },
+        {
+          "hero_id": 100,
+          "games": 274,
+          "wins": 167,
+          "winrate": 60.9
+        },
+        {
+          "hero_id": 53,
+          "games": 260,
+          "wins": 164,
+          "winrate": 63.1
+        },
+        {
+          "hero_id": 55,
+          "games": 247,
+          "wins": 153,
+          "winrate": 61.9
+        },
+        {
+          "hero_id": 65,
+          "games": 233,
+          "wins": 135,
+          "winrate": 57.9
+        }
+      ]
+    },
+    {
+      "team_id": 8255888,
+      "name": "BetBoom Team",
+      "tag": "BetBoom",
+      "logo_url": "https://cdn.steamusercontent.com/ugc/9995426432403529725/51E13136D4CCC8C7D8062861541A1D13B8ED87E0/",
+      "rating": 1432.47,
+      "all_time_wins": 553,
+      "all_time_losses": 450,
+      "last_match_time": 1763838454,
+      "current_roster": [
+        {
+          "account_id": 317880638,
+          "name": "Save-",
+          "games_played": 748,
+          "wins": 436,
+          "winrate": 58.3
+        },
+        {
+          "account_id": 480412663,
+          "name": "gpk~",
+          "games_played": 673,
+          "wins": 388,
+          "winrate": 57.7
+        },
+        {
+          "account_id": 165564598,
+          "name": "MieRo",
+          "games_played": 520,
+          "wins": 294,
+          "winrate": 56.5
+        },
+        {
+          "account_id": 331855530,
+          "name": "Pure",
+          "games_played": 469,
+          "wins": 292,
+          "winrate": 62.3
+        },
+        {
+          "account_id": 431770905,
+          "name": "TORONTOTOKYO",
+          "games_played": 390,
+          "wins": 225,
+          "winrate": 57.7
+        }
+      ],
+      "recent_stats": {
+        "matches": 100,
+        "wins": 54,
+        "losses": 46,
+        "winrate": 54.0,
+        "avg_duration_sec": 2583,
+        "avg_duration_min": 43.0
+      },
+      "top_heroes": [
+        {
+          "hero_id": 38,
+          "games": 115,
+          "wins": 74,
+          "winrate": 64.3
+        },
+        {
+          "hero_id": 17,
+          "games": 103,
+          "wins": 63,
+          "winrate": 61.2
+        },
+        {
+          "hero_id": 49,
+          "games": 101,
+          "wins": 59,
+          "winrate": 58.4
+        },
+        {
+          "hero_id": 58,
+          "games": 99,
+          "wins": 48,
+          "winrate": 48.5
+        },
+        {
+          "hero_id": 13,
+          "games": 95,
+          "wins": 41,
+          "winrate": 43.2
+        }
+      ]
+    },
+    {
+      "team_id": 36,
+      "name": "Natus Vincere",
+      "tag": "NAVI",
+      "logo_url": "https://steamcdn-a.akamaihd.net/apps/dota2/images/team_logos/36.png",
+      "rating": 1343.82,
+      "all_time_wins": 1342,
+      "all_time_losses": 1125,
+      "last_match_time": 1764935202,
+      "current_roster": [
+        {
+          "account_id": 70388657,
+          "name": "Dendi",
+          "games_played": 1467,
+          "wins": 831,
+          "winrate": 56.6
+        },
+        {
+          "account_id": 89625472,
+          "name": null,
+          "games_played": 913,
+          "wins": 545,
+          "winrate": 59.7
+        },
+        {
+          "account_id": 86723143,
+          "name": null,
+          "games_played": 734,
+          "wins": 437,
+          "winrate": 59.5
+        },
+        {
+          "account_id": 117421467,
+          "name": "SoNNeikO",
+          "games_played": 723,
+          "wins": 376,
+          "winrate": 52.0
+        },
+        {
+          "account_id": 87278757,
+          "name": "Puppey",
+          "games_played": 666,
+          "wins": 421,
+          "winrate": 63.2
+        }
+      ],
+      "recent_stats": {
+        "matches": 100,
+        "wins": 56,
+        "losses": 44,
+        "winrate": 56.0,
+        "avg_duration_sec": 2453,
+        "avg_duration_min": 40.9
+      },
+      "top_heroes": [
+        {
+          "hero_id": 86,
+          "games": 347,
+          "wins": 194,
+          "winrate": 55.9
+        },
+        {
+          "hero_id": 65,
+          "games": 256,
+          "wins": 141,
+          "winrate": 55.1
+        },
+        {
+          "hero_id": 13,
+          "games": 253,
+          "wins": 143,
+          "winrate": 56.5
+        },
+        {
+          "hero_id": 66,
+          "games": 240,
+          "wins": 156,
+          "winrate": 65.0
+        },
+        {
+          "hero_id": 54,
+          "games": 225,
+          "wins": 143,
+          "winrate": 63.6
+        }
+      ]
+    },
+    {
+      "team_id": 9467224,
+      "name": "Aurora Gaming",
+      "tag": "Aurora",
+      "logo_url": "https://cdn.steamusercontent.com/ugc/13052583756685508/22B0338D7E09FB2F021E5DB5BBEFFD170D5E5E1A/",
+      "rating": 1331.41,
+      "all_time_wins": 199,
+      "all_time_losses": 177,
+      "last_match_time": 1762520179,
+      "current_roster": [
+        {
+          "account_id": 431770905,
+          "name": "TORONTOTOKYO",
+          "games_played": 250,
+          "wins": 137,
+          "winrate": 54.8
+        },
+        {
+          "account_id": 256156323,
+          "name": "Mira",
+          "games_played": 250,
+          "wins": 137,
+          "winrate": 54.8
+        },
+        {
+          "account_id": 124801257,
+          "name": "Nightfall",
+          "games_played": 245,
+          "wins": 135,
+          "winrate": 55.1
+        },
+        {
+          "account_id": 108958769,
+          "name": "panto",
+          "games_played": 203,
+          "wins": 115,
+          "winrate": 56.7
+        },
+        {
+          "account_id": 858106446,
+          "name": "kiyotaka",
+          "games_played": 181,
+          "wins": 104,
+          "winrate": 57.5
+        }
+      ],
+      "recent_stats": {
+        "matches": 100,
+        "wins": 53,
+        "losses": 47,
+        "winrate": 53.0,
+        "avg_duration_sec": 2484,
+        "avg_duration_min": 41.4
+      },
+      "top_heroes": [
+        {
+          "hero_id": 100,
+          "games": 55,
+          "wins": 28,
+          "winrate": 50.9
+        },
+        {
+          "hero_id": 19,
+          "games": 50,
+          "wins": 23,
+          "winrate": 46.0
+        },
+        {
+          "hero_id": 123,
+          "games": 46,
+          "wins": 26,
+          "winrate": 56.5
+        },
+        {
+          "hero_id": 17,
+          "games": 45,
+          "wins": 23,
+          "winrate": 51.1
+        },
+        {
+          "hero_id": 64,
+          "games": 42,
+          "wins": 18,
+          "winrate": 42.9
+        }
+      ]
+    },
+    {
+      "team_id": 2586976,
+      "name": "OG",
+      "tag": "OG",
+      "logo_url": "https://steamcdn-a.akamaihd.net/apps/dota2/images/team_logos/2586976.png",
+      "rating": 1326.75,
+      "all_time_wins": 1203,
+      "all_time_losses": 887,
+      "last_match_time": 1764923397,
+      "current_roster": [
+        {
+          "account_id": 19672354,
+          "name": null,
+          "games_played": 1182,
+          "wins": 721,
+          "winrate": 61.0
+        },
+        {
+          "account_id": 88271237,
+          "name": "Ceb",
+          "games_played": 931,
+          "wins": 515,
+          "winrate": 55.3
+        },
+        {
+          "account_id": 26771994,
+          "name": null,
+          "games_played": 626,
+          "wins": 394,
+          "winrate": 62.9
+        },
+        {
+          "account_id": 94155156,
+          "name": "Fly",
+          "games_played": 616,
+          "wins": 394,
+          "winrate": 64.0
+        },
+        {
+          "account_id": 93618577,
+          "name": "bzm",
+          "games_played": 604,
+          "wins": 331,
+          "winrate": 54.8
+        }
+      ],
+      "recent_stats": {
+        "matches": 100,
+        "wins": 43,
+        "losses": 57,
+        "winrate": 43.0,
+        "avg_duration_sec": 2400,
+        "avg_duration_min": 40.0
+      },
+      "top_heroes": [
+        {
+          "hero_id": 74,
+          "games": 212,
+          "wins": 123,
+          "winrate": 58.0
+        },
+        {
+          "hero_id": 107,
+          "games": 208,
+          "wins": 137,
+          "winrate": 65.9
+        },
+        {
+          "hero_id": 65,
+          "games": 204,
+          "wins": 109,
+          "winrate": 53.4
+        },
+        {
+          "hero_id": 86,
+          "games": 199,
+          "wins": 110,
+          "winrate": 55.3
+        },
+        {
+          "hero_id": 106,
+          "games": 199,
+          "wins": 126,
+          "winrate": 63.3
+        }
+      ]
+    },
+    {
+      "team_id": 8599101,
+      "name": "Gaimin Gladiators",
+      "tag": "GG",
+      "logo_url": "https://cdn.steamusercontent.com/ugc/1850419664501191993/5DAAB68FB5604D29E1792A0F35E74B3FE3F3A026/",
+      "rating": 1322.47,
+      "all_time_wins": 552,
+      "all_time_losses": 396,
+      "last_match_time": 1755802687,
+      "current_roster": [
+        {
+          "account_id": 97590558,
+          "name": "Ace ♠",
+          "games_played": 949,
+          "wins": 553,
+          "winrate": 58.3
+        },
+        {
+          "account_id": 16497807,
+          "name": "tOfu",
+          "games_played": 948,
+          "wins": 553,
+          "winrate": 58.3
+        },
+        {
+          "account_id": 91730177,
+          "name": "Seleri",
+          "games_played": 782,
+          "wins": 465,
+          "winrate": 59.5
+        },
+        {
+          "account_id": 221666230,
+          "name": "Quinn",
+          "games_played": 778,
+          "wins": 456,
+          "winrate": 58.6
+        },
+        {
+          "account_id": 116934015,
+          "name": "dyrachyo",
+          "games_played": 671,
+          "wins": 408,
+          "winrate": 60.8
+        }
+      ],
+      "recent_stats": {
+        "matches": 100,
+        "wins": 48,
+        "losses": 52,
+        "winrate": 48.0,
+        "avg_duration_sec": 2286,
+        "avg_duration_min": 38.1
+      },
+      "top_heroes": [
+        {
+          "hero_id": 120,
+          "games": 131,
+          "wins": 79,
+          "winrate": 60.3
+        },
+        {
+          "hero_id": 58,
+          "games": 122,
+          "wins": 72,
+          "winrate": 59.0
+        },
+        {
+          "hero_id": 86,
+          "games": 106,
+          "wins": 70,
+          "winrate": 66.0
+        },
+        {
+          "hero_id": 38,
+          "games": 101,
+          "wins": 55,
+          "winrate": 54.5
+        },
+        {
+          "hero_id": 106,
+          "games": 94,
+          "wins": 56,
+          "winrate": 59.6
+        }
+      ]
+    },
+    {
+      "team_id": 9303484,
+      "name": "HEROIC",
+      "tag": "HEROIC",
+      "logo_url": "https://cdn.steamusercontent.com/ugc/2471984170520125054/B066431AF4D322D300DD5180CEC8F6BA0E85A7F5/",
+      "rating": 1307.6,
+      "all_time_wins": 281,
+      "all_time_losses": 242,
+      "last_match_time": 1764518413,
+      "current_roster": [
+        {
+          "account_id": 81306398,
+          "name": "KingJungles",
+          "games_played": 524,
+          "wins": 283,
+          "winrate": 54.0
+        },
+        {
+          "account_id": 157989498,
+          "name": "Scofield",
+          "games_played": 502,
+          "wins": 274,
+          "winrate": 54.6
+        },
+        {
+          "account_id": 131303632,
+          "name": "4nalog丶01",
+          "games_played": 450,
+          "wins": 244,
+          "winrate": 54.2
+        },
+        {
+          "account_id": 138880576,
+          "name": "Davai Lama",
+          "games_played": 339,
+          "wins": 183,
+          "winrate": 54.0
+        },
+        {
+          "account_id": 177203952,
+          "name": "Yuma",
+          "games_played": 269,
+          "wins": 142,
+          "winrate": 52.8
+        }
+      ],
+      "recent_stats": {
+        "matches": 100,
+        "wins": 52,
+        "losses": 48,
+        "winrate": 52.0,
+        "avg_duration_sec": 2482,
+        "avg_duration_min": 41.4
+      },
+      "top_heroes": [
+        {
+          "hero_id": 51,
+          "games": 89,
+          "wins": 56,
+          "winrate": 62.9
+        },
+        {
+          "hero_id": 72,
+          "games": 70,
+          "wins": 39,
+          "winrate": 55.7
+        },
+        {
+          "hero_id": 100,
+          "games": 64,
+          "wins": 32,
+          "winrate": 50.0
+        },
+        {
+          "hero_id": 123,
+          "games": 59,
+          "wins": 34,
+          "winrate": 57.6
+        },
+        {
+          "hero_id": 120,
+          "games": 50,
+          "wins": 27,
+          "winrate": 54.0
+        }
+      ]
+    },
+    {
+      "team_id": 9824702,
+      "name": "PARIVISION",
+      "tag": "PARI",
+      "logo_url": "https://cdn.steamusercontent.com/ugc/11751543457229798134/1569CC553CB72963C8EC4C3F807EE50DA925BDC2/",
+      "rating": 1263.48,
+      "all_time_wins": 24,
+      "all_time_losses": 21,
+      "last_match_time": 1761566930,
+      "current_roster": [
+        {
+          "account_id": 1044002267,
+          "name": "Satanic",
+          "games_played": 45,
+          "wins": 24,
+          "winrate": 53.3
+        },
+        {
+          "account_id": 56351509,
+          "name": "DM",
+          "games_played": 45,
+          "wins": 24,
+          "winrate": 53.3
+        },
+        {
+          "account_id": 73401082,
+          "name": "Dukalis",
+          "games_played": 45,
+          "wins": 24,
+          "winrate": 53.3
+        },
+        {
+          "account_id": 164199202,
+          "name": "9Class",
+          "games_played": 45,
+          "wins": 24,
+          "winrate": 53.3
+        },
+        {
+          "account_id": 106573901,
+          "name": "No[o]ne-",
+          "games_played": 45,
+          "wins": 24,
+          "winrate": 53.3
+        }
+      ],
+      "recent_stats": {
+        "matches": 45,
+        "wins": 24,
+        "losses": 21,
+        "winrate": 53.3,
+        "avg_duration_sec": 2450,
+        "avg_duration_min": 40.8
+      },
+      "top_heroes": [
+        {
+          "hero_id": 66,
+          "games": 12,
+          "wins": 8,
+          "winrate": 66.7
+        },
+        {
+          "hero_id": 38,
+          "games": 10,
+          "wins": 4,
+          "winrate": 40.0
+        },
+        {
+          "hero_id": 53,
+          "games": 8,
+          "wins": 6,
+          "winrate": 75.0
+        },
+        {
+          "hero_id": 126,
+          "games": 7,
+          "wins": 3,
+          "winrate": 42.9
+        },
+        {
+          "hero_id": 13,
+          "games": 7,
+          "wins": 4,
+          "winrate": 57.1
+        }
+      ]
+    },
+    {
+      "team_id": 1883502,
+      "name": "Virtus.pro",
+      "tag": "VP",
+      "logo_url": "https://steamcdn-a.akamaihd.net/apps/dota2/images/team_logos/1883502.png",
+      "rating": 1262.99,
+      "all_time_wins": 1369,
+      "all_time_losses": 1016,
+      "last_match_time": 1650719046,
+      "current_roster": [
+        {
+          "account_id": 106573901,
+          "name": "No[o]ne-",
+          "games_played": 928,
+          "wins": 607,
+          "winrate": 65.4
+        },
+        {
+          "account_id": 26316691,
+          "name": null,
+          "games_played": 920,
+          "wins": 489,
+          "winrate": 53.2
+        },
+        {
+          "account_id": 134556694,
+          "name": "Solo",
+          "games_played": 915,
+          "wins": 595,
+          "winrate": 65.0
+        },
+        {
+          "account_id": 87586992,
+          "name": null,
+          "games_played": 805,
+          "wins": 394,
+          "winrate": 48.9
+        },
+        {
+          "account_id": 106809101,
+          "name": null,
+          "games_played": 758,
+          "wins": 471,
+          "winrate": 62.1
+        }
+      ],
+      "recent_stats": {
+        "matches": 100,
+        "wins": 59,
+        "losses": 41,
+        "winrate": 59.0,
+        "avg_duration_sec": 2168,
+        "avg_duration_min": 36.1
+      },
+      "top_heroes": [
+        {
+          "hero_id": 20,
+          "games": 273,
+          "wins": 155,
+          "winrate": 56.8
+        },
+        {
+          "hero_id": 53,
+          "games": 255,
+          "wins": 142,
+          "winrate": 55.7
+        },
+        {
+          "hero_id": 87,
+          "games": 250,
+          "wins": 154,
+          "winrate": 61.6
+        },
+        {
+          "hero_id": 13,
+          "games": 245,
+          "wins": 114,
+          "winrate": 46.5
+        },
+        {
+          "hero_id": 55,
+          "games": 238,
+          "wins": 132,
+          "winrate": 55.5
+        }
+      ]
+    },
+    {
+      "team_id": 7554697,
+      "name": "Nigma Galaxy",
+      "tag": "NGX",
+      "logo_url": "https://cdn.steamusercontent.com/ugc/1827894588975105240/421C0D8318D71D5DD31FD08A7933AB622AE26590/",
+      "rating": 1225.7,
+      "all_time_wins": 545,
+      "all_time_losses": 506,
+      "last_match_time": 1763480108,
+      "current_roster": [
+        {
+          "account_id": 101356886,
+          "name": "GH",
+          "games_played": 965,
+          "wins": 508,
+          "winrate": 52.6
+        },
+        {
+          "account_id": 105248644,
+          "name": "Miracle-",
+          "games_played": 704,
+          "wins": 380,
+          "winrate": 54.0
+        },
+        {
+          "account_id": 82262664,
+          "name": "kky",
+          "games_played": 647,
+          "wins": 334,
+          "winrate": 51.6
+        },
+        {
+          "account_id": 34505203,
+          "name": "mc",
+          "games_played": 617,
+          "wins": 327,
+          "winrate": 53.0
+        },
+        {
+          "account_id": 111620041,
+          "name": "SumaiL-",
+          "games_played": 545,
+          "wins": 276,
+          "winrate": 50.6
+        }
+      ],
+      "recent_stats": {
+        "matches": 100,
+        "wins": 45,
+        "losses": 55,
+        "winrate": 45.0,
+        "avg_duration_sec": 2502,
+        "avg_duration_min": 41.7
+      },
+      "top_heroes": [
+        {
+          "hero_id": 110,
+          "games": 134,
+          "wins": 72,
+          "winrate": 53.7
+        },
+        {
+          "hero_id": 65,
+          "games": 125,
+          "wins": 64,
+          "winrate": 51.2
+        },
+        {
+          "hero_id": 100,
+          "games": 112,
+          "wins": 59,
+          "winrate": 52.7
+        },
+        {
+          "hero_id": 91,
+          "games": 106,
+          "wins": 58,
+          "winrate": 54.7
+        },
+        {
+          "hero_id": 38,
+          "games": 97,
+          "wins": 48,
+          "winrate": 49.5
+        }
+      ]
+    }
+  ]
+}
