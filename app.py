@@ -563,21 +563,17 @@ def render_analytics_2025():
                 from database import get_supabase_client
                 client = get_supabase_client()
                 if client:
-                    # Get hero pick/ban stats using RPC or aggregation
-                    result = client.rpc("get_hero_stats_2025").execute() if hasattr(client, 'rpc') else None
-                    
-                    if not result or not result.data:
-                        # Fallback: sample data
-                        result = client.table("picks_bans_2025")\
-                            .select("hero_id, is_pick")\
-                            .limit(50000)\
-                            .execute()
+                    # Get hero pick/ban stats directly
+                    result = client.table("picks_bans_2025")\
+                        .select("hero_id, is_pick")\
+                        .limit(100000)\
+                        .execute()
                     
                     if result.data:
                         import pandas as pd
                         df = pd.DataFrame(result.data)
                         
-                        if "hero_id" in df.columns:
+                        if "hero_id" in df.columns and len(df) > 0:
                             picks = df[df["is_pick"] == True].groupby("hero_id").size()
                             bans = df[df["is_pick"] == False].groupby("hero_id").size()
                             
@@ -595,7 +591,9 @@ def render_analytics_2025():
                             # Top picks chart
                             st.bar_chart(hero_stats["Picks"].head(15))
                         else:
-                            st.dataframe(df.head(20), use_container_width=True)
+                            st.info("Nenhum dado de heróis encontrado")
+                    else:
+                        st.info("Tabela picks_bans_2025 vazia")
             except Exception as e:
                 st.warning(f"Erro ao carregar heróis: {e}")
         else:
