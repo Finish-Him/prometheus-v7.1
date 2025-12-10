@@ -4,8 +4,23 @@ DreamLeague Season 27 Edition
 """
 import streamlit as st
 import json
+import sys
 from pathlib import Path
 from datetime import datetime
+
+# Add src to path for imports
+sys.path.insert(0, str(Path(__file__).parent / "src"))
+
+# Try to import database module, fallback to JSON loading
+try:
+    from database import (
+        load_dreamleague, load_pro_teams, load_pro_players,
+        load_bets, save_bet, is_supabase_connected, get_data_source,
+        clear_all_caches
+    )
+    USE_DATABASE = True
+except ImportError:
+    USE_DATABASE = False
 
 # Page Config
 st.set_page_config(
@@ -28,30 +43,35 @@ def load_json(filepath):
         st.error(f"Error loading {filepath}: {e}")
     return {}
 
-def load_dreamleague():
-    """Load DreamLeague S27 data."""
+# Wrapper functions for backward compatibility
+def _load_dreamleague():
+    if USE_DATABASE:
+        return load_dreamleague()
     data = load_json(DATABASE_PATH / "leagues" / "dreamleague_s27.json")
     if not data:
         data = load_json(DATABASE_PATH / "leagues" / "dreamleague_s26.json")
     return data
 
-def load_pro_teams():
-    """Load pro teams data."""
+def _load_pro_teams():
+    if USE_DATABASE:
+        return load_pro_teams()
     return load_json(DATABASE_PATH / "teams" / "pro_teams.json")
 
-def load_pro_players():
-    """Load pro players data."""
+def _load_pro_players():
+    if USE_DATABASE:
+        return load_pro_players()
     return load_json(DATABASE_PATH / "players" / "pro_players.json")
+
+def _load_bets():
+    if USE_DATABASE:
+        return load_bets()
+    data = load_json(DATABASE_PATH / "bets" / "user_bets.json")
+    return data if data else {"bankroll": 1000, "bets": []}
 
 def load_events():
     """Load upcoming events."""
     data = load_json(DATABASE_PATH / "events" / "upcoming.json")
     return data.get("events", [])
-
-def load_bets():
-    """Load user bets."""
-    data = load_json(DATABASE_PATH / "bets" / "user_bets.json")
-    return data if data else {"bankroll": 1000, "bets": []}
 
 def main():
     # Sidebar
@@ -64,8 +84,21 @@ def main():
     )
     
     st.sidebar.markdown("---")
+    
+    # Data source indicator
+    if USE_DATABASE:
+        st.sidebar.caption(f"📊 {get_data_source()}")
+    else:
+        st.sidebar.caption("📊 🟡 JSON (Local)")
+    
     st.sidebar.caption(f"📅 {datetime.now().strftime('%d/%m/%Y %H:%M')}")
     st.sidebar.caption("🔗 Data: OpenDota API")
+    
+    # Refresh button
+    if USE_DATABASE:
+        if st.sidebar.button("🔄 Atualizar Dados"):
+            clear_all_caches()
+            st.rerun()
     
     # Main Content
     if page == "🏠 Dashboard":
@@ -88,10 +121,10 @@ def render_dashboard():
     
     col1, col2, col3, col4 = st.columns(4)
     
-    bets = load_bets()
-    pro_teams = load_pro_teams()
-    pro_players = load_pro_players()
-    dl = load_dreamleague()
+    bets = _load_bets()
+    pro_teams = _load_pro_teams()
+    pro_players = _load_pro_players()
+    dl = _load_dreamleague()
     
     with col1:
         st.metric("💵 Banca", f"R$ {bets.get('bankroll', 1000):.2f}")
@@ -141,8 +174,8 @@ def render_dreamleague():
     """Render DreamLeague S27 page."""
     st.title("🏆 DreamLeague Season 27")
     
-    data = load_dreamleague()
-    pro_teams = load_pro_teams()
+    data = _load_dreamleague()
+    pro_teams = _load_pro_teams()
     
     if not data:
         st.error("❌ Dados não carregados")
@@ -255,7 +288,7 @@ def render_pro_teams():
     """Render Pro Teams page."""
     st.title("👥 Pro Teams - OpenDota Data")
     
-    pro_teams = load_pro_teams()
+    pro_teams = _load_pro_teams()
     teams = pro_teams.get("teams", [])
     
     st.caption(f"📅 Atualização: {pro_teams.get('last_updated', 'N/A')[:10]}")
@@ -302,7 +335,7 @@ def render_pro_players():
     """Render Pro Players page."""
     st.title("🎮 Pro Players - OpenDota Data")
     
-    pro_players = load_pro_players()
+    pro_players = _load_pro_players()
     players = pro_players.get("players", [])
     
     st.caption(f"📅 Atualização: {pro_players.get('last_updated', 'N/A')[:10]}")
@@ -377,7 +410,7 @@ def render_bets():
     """Render bets management page."""
     st.title("💰 Gestão de Apostas")
     
-    bets_data = load_bets()
+    bets_data = _load_bets()
     
     col1, col2, col3 = st.columns(3)
     
@@ -392,7 +425,7 @@ def render_bets():
     
     st.subheader("📝 Nova Aposta")
     
-    dl = load_dreamleague()
+    dl = _load_dreamleague()
     teams = [t.get("name") for t in dl.get("teams", [])]
     
     with st.form("new_bet"):
