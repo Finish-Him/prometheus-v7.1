@@ -454,19 +454,45 @@ def render_bets():
 def render_analytics_2025():
     """Render 2025 Analytics Dashboard."""
     st.title("📊 Analytics 2025")
-    st.subheader("Análise Estatística de 25,672 Partidas Pro")
+    st.subheader("Análise Estatística de Partidas Pro 2025")
     
-    # Load master data
+    # Try Supabase first, fallback to local JSON
+    supabase_data = None
+    if USE_DATABASE:
+        try:
+            from database import get_supabase_client
+            client = get_supabase_client()
+            if client:
+                # Get counts from Supabase
+                matches_count = client.table("matches_2025").select("match_id", count="exact").execute()
+                picks_count = client.table("picks_bans_2025").select("id", count="exact").execute()
+                objectives_count = client.table("objectives_2025").select("id", count="exact").execute()
+                teamfights_count = client.table("teamfights_2025").select("id", count="exact").execute()
+                
+                supabase_data = {
+                    "matches": matches_count.count or 0,
+                    "picks_bans": picks_count.count or 0,
+                    "objectives": objectives_count.count or 0,
+                    "teamfights": teamfights_count.count or 0
+                }
+        except Exception as e:
+            st.sidebar.warning(f"Supabase: {e}")
+    
+    # Fallback to local JSON
     master_path = Path(__file__).parent / "Database" / "2025" / "2025_master.json"
     master_data = load_json(master_path)
     
-    if not master_data:
+    if not supabase_data and not master_data:
         st.warning("⚠️ Dados de 2025 não encontrados. Execute a migração primeiro.")
         st.code("python scripts/migrate_2025_data.py --all")
         return
     
-    # Summary metrics
-    totals = master_data.get("totals", {})
+    # Summary metrics - prefer Supabase data
+    if supabase_data:
+        totals = supabase_data
+        st.success("🔗 Conectado ao Supabase")
+    else:
+        totals = master_data.get("totals", {})
     
     col1, col2, col3, col4, col5 = st.columns(5)
     with col1:
