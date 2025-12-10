@@ -45,12 +45,23 @@ def load_json(filepath):
 
 # Wrapper functions for backward compatibility
 def _load_dreamleague():
+    """Load DreamLeague data with fallback to JSON."""
+    data = None
+    
     if USE_DATABASE:
-        return load_dreamleague()
-    data = load_json(DATABASE_PATH / "leagues" / "dreamleague_s27.json")
-    if not data:
+        try:
+            data = load_dreamleague()
+        except:
+            pass
+    
+    # Fallback to JSON if no schedule data
+    if not data or not data.get("schedule"):
+        data = load_json(DATABASE_PATH / "leagues" / "dreamleague_s27.json")
+    
+    if not data or not data.get("schedule"):
         data = load_json(DATABASE_PATH / "leagues" / "dreamleague_s26.json")
-    return data
+    
+    return data if data else {}
 
 def _load_pro_teams():
     if USE_DATABASE:
@@ -129,24 +140,58 @@ def main():
         render_bets()
 
 def render_dashboard():
-    """Render main dashboard - Quick Overview for Betting."""
-    st.title("🔥 Prometheus V7.3 - Dashboard")
-    
+    """Render main dashboard - Mobile-first design."""
     import pytz
     sp_tz = pytz.timezone('America/Sao_Paulo')
     current_time = datetime.now(sp_tz)
     
-    # Header with live clock
-    col1, col2, col3 = st.columns([2, 1, 1])
-    with col1:
-        st.markdown(f"### ⏰ {current_time.strftime('%H:%M:%S')} BRT")
-    with col2:
-        st.markdown(f"📅 **{current_time.strftime('%d/%m/%Y')}**")
-    with col3:
-        if st.button("🔄 Refresh", key="dash_refresh"):
-            st.rerun()
+    # Mobile-optimized CSS
+    st.markdown("""
+    <style>
+    .match-card {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        padding: 12px 15px;
+        border-radius: 10px;
+        margin: 8px 0;
+        border-left: 4px solid #444;
+    }
+    .match-card.live { border-left-color: #ff4444; }
+    .match-card.soon { border-left-color: #ffaa00; }
+    .match-card.upcoming { border-left-color: #44ff44; }
+    .match-time { font-size: 12px; color: #888; }
+    .match-teams { font-size: 16px; font-weight: bold; text-align: center; padding: 8px 0; }
+    .match-status { font-weight: bold; }
+    .status-live { color: #ff4444; }
+    .status-soon { color: #ffaa00; }
+    .status-ok { color: #44ff44; }
+    .team-card {
+        background: #1a1a2e;
+        padding: 10px 12px;
+        border-radius: 8px;
+        margin: 5px 0;
+    }
+    .metric-box {
+        background: #16213e;
+        padding: 15px;
+        border-radius: 10px;
+        text-align: center;
+        margin: 5px;
+    }
+    .metric-value { font-size: 24px; font-weight: bold; color: #fff; }
+    .metric-label { font-size: 12px; color: #888; }
+    </style>
+    """, unsafe_allow_html=True)
     
-    st.markdown("---")
+    # Header compacto
+    st.markdown(f"""
+    <div style='text-align: center; padding: 5px 0;'>
+        <h2 style='margin: 0;'>🔥 Prometheus</h2>
+        <p style='margin: 5px 0; color: #888;'>⏰ {current_time.strftime('%H:%M')} BRT | 📅 {current_time.strftime('%d/%m')}</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    if st.button("🔄 Atualizar", use_container_width=True):
+        st.rerun()
     
     # Load data
     bets = _load_bets()
@@ -155,105 +200,124 @@ def render_dashboard():
     teams = dl.get("teams", [])
     tournament = dl.get("tournament", {})
     
-    # Main metrics
-    col1, col2, col3, col4 = st.columns(4)
+    # Métricas compactas (2x2 grid)
+    col1, col2 = st.columns(2)
     with col1:
-        st.metric("💵 Banca", f"R$ {bets.get('bankroll', 1000):.2f}")
+        st.metric("💵 Banca", f"R$ {bets.get('bankroll', 1000):.0f}")
     with col2:
-        active_bets = len([b for b in bets.get("bets", []) if b.get("status") == "pending"])
-        st.metric("🎯 Apostas Ativas", active_bets)
-    with col3:
-        st.metric("💰 Prize Pool", f"${tournament.get('prize_pool', 0):,}")
-    with col4:
-        st.metric("🎮 Times DL", len(teams))
+        active = len([b for b in bets.get("bets", []) if b.get("status") == "pending"])
+        st.metric("🎯 Apostas", active)
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        prize = tournament.get('prize_pool', 1000000)
+        st.metric("💰 Prize", f"${prize/1000:.0f}K")
+    with col2:
+        st.metric("🎮 Times", len(teams))
     
     st.markdown("---")
     
-    # PRÓXIMAS PARTIDAS HOJE
-    st.subheader("📅 Próximas Partidas - Hoje")
+    # PARTIDAS - Cards visuais
+    st.markdown("### 📅 Partidas de Hoje")
     
     round_1 = schedule.get("round_1", {}).get("matches", [])
     
     if round_1:
-        # Find upcoming matches
-        upcoming = []
-        for match in round_1:
+        for match in round_1[:8]:
             time_str = match.get('time_brt', '12:00')
             if len(time_str) > 5:
                 time_str = time_str[:5]
+            
+            team_a = match.get('team_a', 'TBD')
+            team_b = match.get('team_b', 'TBD')
+            match_format = match.get('format', 'Bo3')
+            
+            # Countdown
             try:
                 match_time = datetime.strptime(f"2025-12-10 {time_str}", "%Y-%m-%d %H:%M")
                 match_time = sp_tz.localize(match_time)
-                hours_until = (match_time - current_time).total_seconds() / 3600
-                if hours_until > -3:  # Include recent matches
-                    upcoming.append({**match, "hours_until": hours_until, "time_parsed": time_str})
+                hours = (match_time - current_time).total_seconds() / 3600
             except:
-                pass
-        
-        # Sort by time
-        upcoming.sort(key=lambda x: x.get("hours_until", 999))
-        
-        for match in upcoming[:6]:  # Show next 6 matches
-            hours = match.get("hours_until", 0)
+                hours = 99
             
             if hours <= 0:
-                status = "🔴 LIVE/Recente"
-                color = "red"
+                status = "🔴 LIVE"
+                card_class = "live"
+                status_class = "status-live"
             elif hours <= 1:
                 status = f"⚠️ {int(hours*60)}min"
-                color = "orange"
+                card_class = "soon"
+                status_class = "status-soon"
             elif hours <= 2:
                 status = f"🟡 {hours:.1f}h"
-                color = "yellow"
+                card_class = "soon"
+                status_class = "status-soon"
             else:
                 status = f"🟢 {hours:.1f}h"
-                color = "green"
+                card_class = "upcoming"
+                status_class = "status-ok"
             
-            col1, col2, col3, col4, col5 = st.columns([1, 2, 0.5, 2, 1.5])
-            
-            with col1:
-                st.write(f"**{match.get('time_parsed')}**")
-            with col2:
-                st.write(f"**{match.get('team_a')}**")
-            with col3:
-                st.write("vs")
-            with col4:
-                st.write(f"**{match.get('team_b')}**")
-            with col5:
-                st.markdown(f"**{status}**")
-            
-            st.markdown("---")
+            # Card visual
+            st.markdown(f"""
+            <div class='match-card {card_class}'>
+                <div style='display: flex; justify-content: space-between; align-items: center;'>
+                    <span class='match-time'>🕐 {time_str}</span>
+                    <span class='match-status {status_class}'>{status}</span>
+                </div>
+                <div class='match-teams'>
+                    {team_a} <span style='color: #666; padding: 0 8px;'>vs</span> {team_b}
+                </div>
+                <div style='text-align: center; font-size: 11px; color: #666;'>{match_format}</div>
+            </div>
+            """, unsafe_allow_html=True)
     else:
-        st.info("Nenhuma partida agendada para hoje")
-    
-    # Quick Stats - Times Tier S
-    st.subheader("⭐ Times Tier S - DreamLeague")
-    
-    tier_s = [t for t in teams if t.get("tier") == "S"]
-    
-    if tier_s:
-        cols = st.columns(min(len(tier_s), 4))
-        for i, team in enumerate(tier_s[:4]):
-            with cols[i]:
-                st.markdown(f"### {team.get('name')}")
-                st.caption(f"🌍 {team.get('region')} | #{team.get('ranking', 'N/A')}")
-                roster = team.get("roster", [])
-                if roster:
-                    st.caption(f"⭐ {roster[0].get('name', '')} (carry)")
+        st.info("📭 Nenhuma partida agendada")
     
     st.markdown("---")
     
-    # Stream Links
-    st.subheader("📺 Streams")
+    # TOP TEAMS - Compacto
+    st.markdown("### ⭐ Favoritos")
+    
+    tier_s = [t for t in teams if t.get("tier") in ["S", "A"]][:6]
+    
+    for team in tier_s:
+        roster = team.get("roster", [])
+        players = ", ".join([p.get("name", "") for p in roster[:3]]) if roster else "N/A"
+        
+        st.markdown(f"""
+        <div class='team-card'>
+            <div style='display: flex; justify-content: space-between; align-items: center;'>
+                <span style='font-weight: bold;'>🏆 {team.get("name")}</span>
+                <span style='color: #888; font-size: 12px;'>#{team.get("ranking", "?")} {team.get("region", "")}</span>
+            </div>
+            <div style='font-size: 11px; color: #666; margin-top: 4px;'>
+                ⚔️ {players}
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    st.markdown("---")
+    
+    # Links rápidos
     col1, col2 = st.columns(2)
     with col1:
-        st.link_button("🟣 Twitch - DreamLeague", "https://twitch.tv/dreamleague")
+        st.link_button("🟣 Twitch", "https://twitch.tv/dreamleague", use_container_width=True)
     with col2:
-        st.link_button("🔴 YouTube - DreamLeague", "https://youtube.com/dreamleague")
+        st.link_button("🔴 YouTube", "https://youtube.com/dreamleague", use_container_width=True)
 
 def render_dreamleague():
-    """Render DreamLeague S27 page - COMPLETE HUB."""
-    st.title("🏆 DreamLeague Season 27 - Hub Completo")
+    """Render DreamLeague S27 page - Mobile-optimized."""
+    import pytz
+    sp_tz = pytz.timezone('America/Sao_Paulo')
+    current_time = datetime.now(sp_tz)
+    
+    # Mobile header
+    st.markdown(f"""
+    <div style='text-align: center;'>
+        <h2>🏆 DreamLeague S27</h2>
+        <p style='color: #888;'>Stockholm | 09-20 Dez | $1M Prize</p>
+    </div>
+    """, unsafe_allow_html=True)
     
     data = _load_dreamleague()
     pro_teams = _load_pro_teams()
@@ -266,370 +330,170 @@ def render_dreamleague():
     teams = data.get("teams", [])
     schedule = data.get("schedule", {})
     
-    # Import new modules
+    # Import modules
     try:
-        from notifications import MatchSchedule, get_hours_until_match, format_countdown, get_countdown_color
+        from notifications import get_hours_until_match, format_countdown, get_countdown_color
         from odds_tracker import get_tracker, calculate_kelly
         from draft_analyzer import analyze_draft, analyze_single_draft
         MODULES_AVAILABLE = True
-    except ImportError as e:
-        st.warning(f"⚠️ Módulos V7.3 não disponíveis: {e}")
+    except ImportError:
         MODULES_AVAILABLE = False
     
-    # Live clock
-    import pytz
-    sp_tz = pytz.timezone('America/Sao_Paulo')
-    current_time = datetime.now(sp_tz)
-    
-    # Header metrics
-    col1, col2, col3, col4, col5 = st.columns(5)
-    
+    # Métricas compactas mobile
+    col1, col2 = st.columns(2)
     with col1:
-        st.metric("💰 Prize Pool", f"${tournament.get('prize_pool', 0):,}")
-    with col2:
-        st.metric("📅 Início", tournament.get('start_date', 'TBD'))
-    with col3:
         st.metric("🎮 Times", len(teams))
-    with col4:
-        st.metric("📍 Local", tournament.get("location", "Stockholm"))
-    with col5:
-        st.metric("🕐 Agora (BRT)", current_time.strftime('%H:%M'))
+    with col2:
+        st.metric("⏰ Agora", current_time.strftime('%H:%M'))
     
-    st.markdown("---")
+    # Tabs simplificadas
+    tab1, tab2, tab3, tab4 = st.tabs(["📅 Partidas", "👥 Times", "💰 Odds", "🎯 Draft"])
     
-    # Main tabs
-    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
-        "📅 Próximas Partidas", 
-        "📊 Últimas Partidas", 
-        "👥 Times & Stats", 
-        "💰 Odds & Value",
-        "🎯 Draft Analyzer",
-        "📧 Notificações"
-    ])
-    
-    # TAB 1 - PRÓXIMAS PARTIDAS COM COUNTDOWN
+    # TAB 1 - PARTIDAS (Mobile cards)
     with tab1:
-        st.subheader("📅 Próximas Partidas - DreamLeague S27")
-        
         round_1 = schedule.get("round_1", {}).get("matches", [])
         
         if not round_1:
-            st.info("Nenhuma partida agendada")
-        
-        for i, match in enumerate(round_1):
-            # Calculate countdown
-            time_str = match.get('time_brt', '12:00')
-            # Handle both HH:MM and HH:MM:SS formats
-            if len(time_str) > 5:
-                time_str = time_str[:5]  # Truncate to HH:MM
-            match_date = datetime.strptime(f"2025-12-10 {time_str}", "%Y-%m-%d %H:%M")
-            match_date = sp_tz.localize(match_date)
-            
-            if MODULES_AVAILABLE:
-                hours_until = get_hours_until_match(match_date)
-                countdown = format_countdown(hours_until)
-                color = get_countdown_color(hours_until)
-            else:
-                hours_until = (match_date - current_time).total_seconds() / 3600
-                countdown = f"{hours_until:.1f}h" if hours_until > 0 else "🔴 LIVE"
-                color = "🟢" if hours_until > 2 else "🟠" if hours_until > 0 else "🔴"
-            
-            with st.container():
-                col1, col2, col3, col4, col5 = st.columns([1, 2, 1, 2, 1.5])
+            st.info("📭 Nenhuma partida")
+        else:
+            for match in round_1[:10]:
+                time_str = match.get('time_brt', '12:00')
+                if len(time_str) > 5:
+                    time_str = time_str[:5]
                 
-                with col1:
-                    st.write(f"🕐 **{time_str}** BRT")
-                    st.caption(f"{match.get('time_cet', '')} CET")
+                team_a = match.get("team_a", "TBD")
+                team_b = match.get("team_b", "TBD")
                 
-                with col2:
-                    team_a = match.get("team_a", "TBD")
-                    st.write(f"**{team_a}**")
+                # Countdown
+                try:
+                    match_time = datetime.strptime(f"2025-12-10 {time_str}", "%Y-%m-%d %H:%M")
+                    match_time = sp_tz.localize(match_time)
+                    hours = (match_time - current_time).total_seconds() / 3600
+                except:
+                    hours = 99
                 
-                with col3:
-                    st.write("**vs**")
-                    st.caption(match.get('format', 'Bo2'))
+                if hours <= 0:
+                    status = "🔴 LIVE"
+                    border = "#ff4444"
+                elif hours <= 2:
+                    status = f"⚠️ {int(hours*60)}min" if hours < 1 else f"🟡 {hours:.1f}h"
+                    border = "#ffaa00"
+                else:
+                    status = f"🟢 {hours:.1f}h"
+                    border = "#44ff44"
                 
-                with col4:
-                    team_b = match.get("team_b", "TBD")
-                    st.write(f"**{team_b}**")
-                
-                with col5:
-                    st.write(f"{color} **{countdown}**")
-                    if hours_until > 0 and hours_until <= 2:
-                        st.caption("⚠️ Relatório em breve!")
-                
-                # Expandable details
-                match_key = f"match_{i}"
-                if st.button(f"📊 Ver Análise", key=f"btn_{match_key}"):
-                    st.session_state[f"show_{match_key}"] = not st.session_state.get(f"show_{match_key}", False)
-                
-                if st.session_state.get(f"show_{match_key}", False):
-                    with st.expander("📊 Análise Detalhada", expanded=True):
-                        st.write(f"**{team_a} vs {team_b}**")
-                        st.write("• Head-to-Head: Calculando...")
-                        st.write("• Form recente: Carregando...")
-                        st.write("• Previsão: Aguardando análise AI")
-                
-                st.markdown("---")
+                st.markdown(f"""
+                <div style='background: #1a1a2e; padding: 12px; border-radius: 8px; 
+                            margin: 6px 0; border-left: 3px solid {border};'>
+                    <div style='display: flex; justify-content: space-between;'>
+                        <span style='font-size: 12px; color: #888;'>🕐 {time_str}</span>
+                        <span style='font-weight: bold; color: {border};'>{status}</span>
+                    </div>
+                    <div style='text-align: center; padding: 8px 0; font-size: 15px;'>
+                        <b>{team_a}</b> <span style='color: #666;'>vs</span> <b>{team_b}</b>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
     
-    # TAB 2 - ÚLTIMAS PARTIDAS
+    # TAB 2 - TIMES (Mobile cards)
     with tab2:
-        st.subheader("📊 Últimas Partidas Finalizadas")
-        
-        st.info("🔄 Conectar com OpenDota API para resultados em tempo real")
-        
-        # Placeholder for recent results
-        sample_results = [
-            {"team_a": "Team Liquid", "team_b": "Tundra", "score": "2-0", "duration": "34min avg"},
-            {"team_a": "Gaimin Gladiators", "team_b": "BetBoom", "score": "1-1", "duration": "41min avg"},
-        ]
-        
-        for result in sample_results:
-            col1, col2, col3, col4 = st.columns([2, 1, 2, 1])
-            with col1:
-                st.write(f"**{result['team_a']}**")
-            with col2:
-                st.write(f"**{result['score']}**")
-            with col3:
-                st.write(f"**{result['team_b']}**")
-            with col4:
-                st.caption(result['duration'])
-            st.markdown("---")
-    
-    # TAB 3 - TIMES & STATS
-    with tab3:
-        st.subheader("👥 Times Participantes - Multi-Layer Stats")
+        st.markdown("### 👥 Times")
         
         pro_map = {t.get("team_id"): t for t in pro_teams.get("teams", [])}
-        
-        # Filters
-        col1, col2 = st.columns(2)
-        with col1:
-            tier_filter = st.selectbox("Filtrar por Tier", ["Todos", "S", "A", "B", "C"], key="tier_dl")
-        with col2:
-            region_filter = st.selectbox("Filtrar por Região", ["Todos", "EU", "NA", "CIS", "CN", "SEA"], key="region_dl")
+        tier_filter = st.selectbox("Tier", ["Todos", "S", "A", "B", "C"], key="tier_dl")
         
         for team in teams:
             tier = team.get("tier", "C")
-            region = team.get("region", "EU")
-            
             if tier_filter != "Todos" and tier != tier_filter:
                 continue
-            if region_filter != "Todos" and region != region_filter:
-                continue
             
-            tier_emoji = {"S": "🟣", "A": "🔵", "B": "🟢", "C": "⚪"}.get(tier, "⚪")
-            team_id = team.get("team_id")
-            pro_data = pro_map.get(team_id, {})
+            tier_color = {"S": "#9b59b6", "A": "#3498db", "B": "#2ecc71", "C": "#95a5a6"}.get(tier, "#95a5a6")
+            pro_data = pro_map.get(team.get("team_id"), {})
+            recent = pro_data.get("recent_stats", {}) if pro_data else {}
             
-            with st.expander(f"{tier_emoji} **{team.get('name')}** ({team.get('tag')}) - {region}"):
-                # Layer 1: Basic Info
-                st.markdown("##### 📋 Informações Básicas")
-                col1, col2, col3 = st.columns(3)
-                
-                with col1:
-                    st.metric("🌍 Região", region)
-                    st.metric("🏆 Ranking", f"#{team.get('ranking', 'N/A')}")
-                
-                with col2:
-                    if pro_data:
-                        st.metric("⭐ Rating", f"{pro_data.get('rating', 0):.0f}")
-                        recent = pro_data.get("recent_stats", {})
-                        st.metric("📈 WR (100g)", f"{recent.get('winrate', 0)}%")
-                    else:
-                        st.metric("⭐ Rating", "N/A")
-                
-                with col3:
-                    if pro_data:
-                        recent = pro_data.get("recent_stats", {})
-                        st.metric("✅ Wins", recent.get("wins", 0))
-                        st.metric("❌ Losses", recent.get("losses", 0))
-                
-                # Layer 2: Roster
-                st.markdown("##### 👥 Roster")
-                roster_cols = st.columns(5)
+            st.markdown(f"""
+            <div style='background: #1a1a2e; padding: 12px; border-radius: 8px; 
+                        margin: 6px 0; border-left: 3px solid {tier_color};'>
+                <div style='display: flex; justify-content: space-between; align-items: center;'>
+                    <span style='font-weight: bold;'>{team.get('name')}</span>
+                    <span style='background: {tier_color}; padding: 2px 8px; border-radius: 4px; 
+                                 font-size: 11px;'>Tier {tier}</span>
+                </div>
+                <div style='font-size: 12px; color: #888; margin-top: 4px;'>
+                    {team.get('region', 'EU')} • WR: {recent.get('winrate', 'N/A')}%
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            with st.expander(f"👥 {team.get('tag', '')} Roster"):
                 for i, player in enumerate(team.get("roster", [])[:5]):
-                    with roster_cols[i]:
-                        role_emoji = {"1": "⚔️", "2": "🎯", "3": "🛡️", "4": "💫", "5": "❤️"}.get(str(i+1), "🎮")
-                        st.write(f"{role_emoji} **{player.get('name')}**")
-                        st.caption(player.get('role', f'Pos {i+1}'))
-                
-                # Layer 3: Hero Pool (if available)
-                if pro_data and pro_data.get("top_heroes"):
-                    st.markdown("##### 🦸 Top Heroes")
-                    heroes = pro_data.get("top_heroes", [])[:5]
-                    hero_cols = st.columns(5)
-                    for i, hero in enumerate(heroes):
-                        with hero_cols[i]:
-                            st.write(f"**{hero.get('name', 'N/A')}**")
-                            st.caption(f"{hero.get('matches', 0)} games")
+                    role = ["Carry", "Mid", "Offlane", "Soft", "Hard"][i] if i < 5 else "Sub"
+                    st.write(f"**{i+1}.** {player.get('name')} - {role}")
     
-    # TAB 4 - ODDS & VALUE BETS
-    with tab4:
-        st.subheader("💰 Registro de Odds & Value Finder")
-        
-        if MODULES_AVAILABLE:
-            tracker = get_tracker()
-        else:
-            tracker = None
-        
-        # Register new odds
-        st.markdown("##### ➕ Registrar Nova Odd")
+    # TAB 3 - ODDS (Mobile)
+    with tab3:
+        st.markdown("### 💰 Odds")
         
         team_names = [t.get("name") for t in teams]
         
-        col1, col2 = st.columns(2)
-        with col1:
-            odds_team_a = st.selectbox("Time A", team_names, key="odds_a")
-            odds_value_a = st.number_input("Odd Time A", min_value=1.01, value=1.50, step=0.01, key="val_a")
-        with col2:
-            odds_team_b = st.selectbox("Time B", [t for t in team_names if t != odds_team_a], key="odds_b")
-            odds_value_b = st.number_input("Odd Time B", min_value=1.01, value=2.50, step=0.01, key="val_b")
+        t_a = st.selectbox("Time A", team_names, key="odds_a")
+        odd_a = st.number_input("Odd A", min_value=1.01, value=1.50, key="val_a")
         
-        bookmaker = st.selectbox("Casa de Apostas", ["bet365", "Betano", "Betfair", "Pinnacle", "1xBet", "Rivalry", "GG.bet", "Stake"], key="bm")
+        t_b = st.selectbox("Time B", [t for t in team_names if t != t_a], key="odds_b")
+        odd_b = st.number_input("Odd B", min_value=1.01, value=2.50, key="val_b")
         
-        if st.button("💾 Salvar Odds"):
-            if tracker:
-                match_id = f"{odds_team_a}_vs_{odds_team_b}_{datetime.now().strftime('%Y%m%d')}"
-                result = tracker.register_odds(
-                    match_id, odds_team_a, odds_team_b, 
-                    bookmaker, odds_value_a, odds_value_b,
-                    datetime.now().strftime("%Y-%m-%d")
-                )
-                st.success(f"✅ Odds salvas! Implied: {result['odds']['implied_a']:.1f}% / {result['odds']['implied_b']:.1f}%")
-            else:
-                st.warning("⚠️ Tracker não disponível")
+        bookie = st.selectbox("Casa", ["bet365", "Betano", "Pinnacle", "Stake"], key="bm")
+        
+        if st.button("💾 Salvar"):
+            st.success(f"✅ {t_a} @{odd_a} vs {t_b} @{odd_b}")
         
         st.markdown("---")
-        
-        # Value calculator
-        st.markdown("##### 🎯 Calculadora de Value")
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            prob_a = st.slider("Sua probabilidade (%)", 0, 100, 55, key="prob_calc")
-        with col2:
-            odd_a = st.number_input("Odd disponível", min_value=1.01, value=1.80, step=0.01, key="odd_calc")
-        with col3:
-            implied = 100 / odd_a
-            value = prob_a - implied
-            kelly = calculate_kelly(prob_a, odd_a) if MODULES_AVAILABLE else 0
-            
-            if value > 0:
-                st.success(f"✅ VALUE: +{value:.1f}%")
-                st.caption(f"Kelly: {kelly:.1f}% da banca")
-            else:
-                st.error(f"❌ No Value: {value:.1f}%")
-    
-    # TAB 5 - DRAFT ANALYZER
-    with tab5:
-        st.subheader("🎯 Analisador de Draft")
-        
-        st.markdown("##### Insira os picks de cada time")
+        st.markdown("##### 🎯 Value Calc")
         
         col1, col2 = st.columns(2)
-        
-        # Common heroes for autocomplete
-        hero_options = [
-            "Faceless Void", "Phantom Assassin", "Morphling", "Terrorblade", "Medusa",
-            "Invoker", "Storm Spirit", "Queen of Pain", "Ember Spirit", "Leshrac",
-            "Mars", "Axe", "Tidehunter", "Enigma", "Sand King",
-            "Crystal Maiden", "Lion", "Shadow Shaman", "Oracle", "Io",
-            "Earth Spirit", "Tusk", "Rubick", "Snapfire", "Marci"
-        ]
-        
         with col1:
-            st.markdown("**Radiant Picks**")
-            rad_1 = st.selectbox("Pick 1", hero_options, key="rad1")
-            rad_2 = st.selectbox("Pick 2", hero_options, key="rad2", index=1)
-            rad_3 = st.selectbox("Pick 3", hero_options, key="rad3", index=2)
-            rad_4 = st.selectbox("Pick 4", hero_options, key="rad4", index=3)
-            rad_5 = st.selectbox("Pick 5", hero_options, key="rad5", index=4)
-        
+            prob = st.slider("Prob %", 0, 100, 55, key="prob_c")
         with col2:
-            st.markdown("**Dire Picks**")
-            dire_1 = st.selectbox("Pick 1", hero_options, key="dire1", index=5)
-            dire_2 = st.selectbox("Pick 2", hero_options, key="dire2", index=6)
-            dire_3 = st.selectbox("Pick 3", hero_options, key="dire3", index=7)
-            dire_4 = st.selectbox("Pick 4", hero_options, key="dire4", index=8)
-            dire_5 = st.selectbox("Pick 5", hero_options, key="dire5", index=9)
+            odd = st.number_input("Odd", min_value=1.01, value=1.80, key="odd_c")
         
-        if st.button("🔍 Analisar Draft"):
-            radiant = [rad_1, rad_2, rad_3, rad_4, rad_5]
-            dire = [dire_1, dire_2, dire_3, dire_4, dire_5]
-            
+        implied = 100 / odd
+        value = prob - implied
+        if value > 0:
+            st.success(f"✅ VALUE +{value:.1f}%")
+        else:
+            st.error(f"❌ No Value {value:.1f}%")
+    
+    # TAB 4 - DRAFT (Mobile)
+    with tab4:
+        st.markdown("### 🎯 Draft")
+        
+        heroes = ["Faceless Void", "Phantom Assassin", "Morphling", "Invoker", "Storm Spirit",
+                  "Mars", "Axe", "Tidehunter", "Crystal Maiden", "Lion",
+                  "Earth Spirit", "Tusk", "Rubick", "Snapfire", "Marci"]
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown("**Radiant**")
+            rad = [st.selectbox(f"R{i+1}", heroes, key=f"r{i}", index=i%len(heroes)) for i in range(5)]
+        with col2:
+            st.markdown("**Dire**")
+            dire = [st.selectbox(f"D{i+1}", heroes, key=f"d{i}", index=(i+5)%len(heroes)) for i in range(5)]
+        
+        if st.button("🔍 Analisar"):
             if MODULES_AVAILABLE:
-                analysis = analyze_draft(radiant, dire)
-                
-                st.markdown("---")
-                st.markdown("### 📊 Resultado da Análise")
-                
-                col1, col2, col3 = st.columns(3)
-                with col1:
-                    winner = analysis.get("predicted_winner", "Toss-up")
-                    st.metric("🏆 Draft Winner", winner)
-                with col2:
-                    prob = analysis.get("win_probability", {})
-                    st.metric("Radiant %", f"{prob.get('radiant', 50)}%")
-                with col3:
-                    st.metric("Dire %", f"{prob.get('dire', 50)}%")
-                
-                # Detailed breakdown
-                st.markdown("##### 📈 Comparação de Scores")
-                comparison = analysis.get("comparison", {})
-                for metric, data in comparison.items():
-                    col1, col2, col3 = st.columns([1, 2, 1])
-                    with col1:
-                        st.caption(metric.capitalize())
-                    with col2:
-                        rad_score = data.get('radiant', 0)
-                        dire_score = data.get('dire', 0)
-                        st.progress(rad_score / 10)
-                        st.caption(f"R: {rad_score} | D: {dire_score}")
-                    with col3:
-                        st.write(data.get('advantage', 'Even'))
-                
-                # Game prediction
-                game_pred = analysis.get("game_prediction", {})
-                st.markdown("##### 🎮 Previsão do Jogo")
-                st.write(f"⏱️ Duração: **{game_pred.get('predicted_duration', 'N/A')}**")
-                st.write(f"💀 Kills: **{game_pred.get('kill_prediction', 'N/A')}**")
-                st.write(f"🏰 Objetivos: **{game_pred.get('objective_control', 'N/A')}**")
+                analysis = analyze_draft(rad, dire)
+                winner = analysis.get("predicted_winner", "Even")
+                prob = analysis.get("win_probability", {})
+                st.markdown(f"""
+                <div style='background: #1a1a2e; padding: 15px; border-radius: 8px; text-align: center;'>
+                    <div style='font-size: 18px; margin-bottom: 8px;'>🏆 {winner}</div>
+                    <div style='font-size: 14px; color: #888;'>
+                        Radiant {prob.get('radiant', 50)}% | Dire {prob.get('dire', 50)}%
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
             else:
-                st.warning("⚠️ Draft Analyzer não disponível")
-    
-    # TAB 6 - NOTIFICAÇÕES
-    with tab6:
-        st.subheader("📧 Configuração de Notificações")
-        
-        st.markdown("""
-        ##### 📬 Emails Configurados
-        - moises.costa12345@gmail.com
-        - gabrielol2035@gmail.com
-        """)
-        
-        st.markdown("---")
-        
-        st.markdown("##### ⚙️ Configurações")
-        
-        daily_email = st.checkbox("📅 Email diário com partidas (6:00 BRT)", value=True)
-        report_2h = st.checkbox("📊 Relatório PDF 2h antes de cada série", value=True)
-        live_alert = st.checkbox("🔴 Alerta quando partida começar", value=True)
-        
-        st.markdown("---")
-        
-        st.markdown("##### 🤖 Análise Multi-AI")
-        st.info("""
-        Para relatórios importantes, usamos consenso de múltiplos modelos:
-        - **Gemini 2.5 Pro** - Análise estratégica e meta
-        - **GPT-4o** - Padrões estatísticos e previsões
-        - **Claude Opus 4** - Síntese e relatório final
-        """)
-        
-        # SMTP Config (sensitive - should be in secrets)
-        with st.expander("🔧 Configuração SMTP (Avançado)"):
-            st.text_input("SMTP Server", value="smtp.gmail.com", disabled=True)
-            st.text_input("SMTP Port", value="587", disabled=True)
-            st.caption("⚠️ Configure as credenciais no arquivo .env ou Streamlit Secrets")
+                st.info("📊 Draft Analyzer: Disponível em breve")
 
 
 def render_pro_teams():
