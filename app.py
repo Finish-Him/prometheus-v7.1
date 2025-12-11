@@ -348,34 +348,60 @@ def render_dreamleague():
         match_date = round_1.get("date", datetime.now().strftime("%Y-%m-%d"))
         matches = round_1.get("matches", [])
         
-        st.markdown(f"**📆 {match_date}** - DreamLeague S27")
+        st.markdown(f"**📆 {match_date}** - DreamLeague S27 | Stockholm")
+        st.caption("🌍 Horários em BRT (Brasília) | CET -4h")
+        
+        # Criar mapa de logos dos times
+        logo_map = {}
+        for t in pro_teams.get("teams", []):
+            logo_map[t.get("name", "").lower()] = t.get("logo_url", "")
+            logo_map[t.get("tag", "").lower()] = t.get("logo_url", "")
+        
+        # Função para buscar logo
+        def get_team_logo(team_name):
+            name_lower = team_name.lower()
+            for key, url in logo_map.items():
+                if key in name_lower or name_lower in key:
+                    return url
+            return ""
         
         if not matches:
             st.info("📭 Nenhuma partida")
         else:
             for match in matches[:12]:
-                time_str = match.get('time_brt', '12:00')
-                if len(time_str) > 5:
-                    time_str = time_str[:5]
+                time_brt = match.get('time_brt', '12:00')
+                time_cet = match.get('time_cet', '')
+                if len(time_brt) > 5:
+                    time_brt = time_brt[:5]
                 
                 team_a = match.get("team_a", "TBD")
                 team_b = match.get("team_b", "TBD")
                 match_format = match.get("format", "Bo3")
                 match_status = match.get("status", "scheduled")
                 
-                # Countdown usando data do schedule
+                # Logos
+                logo_a = get_team_logo(team_a)
+                logo_b = get_team_logo(team_b)
+                
+                # Countdown - usar horário BRT diretamente
                 try:
-                    match_time = datetime.strptime(f"{match_date} {time_str}", "%Y-%m-%d %H:%M")
+                    match_time = datetime.strptime(f"{match_date} {time_brt}", "%Y-%m-%d %H:%M")
                     match_time = sp_tz.localize(match_time)
-                    hours = (match_time - current_time).total_seconds() / 3600
+                    delta = (match_time - current_time).total_seconds()
+                    hours = delta / 3600
+                    minutes = delta / 60
                 except:
                     hours = 99
+                    minutes = 9999
                 
-                if match_status == "live" or hours <= 0:
+                if match_status == "live" or hours <= -0.5:
                     status = "🔴 LIVE"
                     border = "#ff4444"
-                elif hours <= 1:
-                    status = f"⚠️ {int(hours*60)}min"
+                elif hours <= 0 and hours > -0.5:
+                    status = "🟠 Iniciando"
+                    border = "#ff8800"
+                elif minutes <= 60:
+                    status = f"⚠️ {int(minutes)}min"
                     border = "#ffaa00"
                 elif hours <= 3:
                     status = f"🟡 {hours:.1f}h"
@@ -384,26 +410,36 @@ def render_dreamleague():
                     status = f"🟢 {hours:.1f}h"
                     border = "#44ff44"
                 
+                # Card com logos
+                logo_html_a = f"<img src='{logo_a}' style='width: 24px; height: 24px; border-radius: 4px; margin-right: 6px;'>" if logo_a else ""
+                logo_html_b = f"<img src='{logo_b}' style='width: 24px; height: 24px; border-radius: 4px; margin-left: 6px;'>" if logo_b else ""
+                
                 st.markdown(f"""
                 <div style='background: #1a1a2e; padding: 12px; border-radius: 8px; 
                             margin: 6px 0; border-left: 3px solid {border};'>
-                    <div style='display: flex; justify-content: space-between;'>
-                        <span style='font-size: 12px; color: #888;'>🕐 {time_str} BRT</span>
-                        <span style='font-weight: bold; color: {border};'>{status}</span>
+                    <div style='display: flex; justify-content: space-between; align-items: center;'>
+                        <span style='font-size: 11px; color: #888;'>🕐 {time_brt} BRT ({time_cet} CET)</span>
+                        <span style='font-weight: bold; color: {border}; font-size: 12px;'>{status}</span>
                     </div>
-                    <div style='text-align: center; padding: 8px 0; font-size: 15px;'>
-                        <b>{team_a}</b> <span style='color: #666;'>vs</span> <b>{team_b}</b>
+                    <div style='display: flex; justify-content: center; align-items: center; padding: 10px 0; font-size: 15px;'>
+                        {logo_html_a}<b>{team_a}</b> 
+                        <span style='color: #666; padding: 0 12px;'>vs</span> 
+                        <b>{team_b}</b>{logo_html_b}
                     </div>
-                    <div style='text-align: center; font-size: 11px; color: #666;'>{match_format}</div>
+                    <div style='text-align: center; font-size: 11px; color: #666;'>{match_format} | Stream: Twitch</div>
                 </div>
                 """, unsafe_allow_html=True)
     
-    # TAB 2 - TIMES (Mobile cards) com Stats Detalhados
+    # TAB 2 - TIMES com Logos e Jogadores Clicáveis
     with tab2:
         st.markdown("### 👥 Times DreamLeague S27")
         
         pro_map = {t.get("team_id"): t for t in pro_teams.get("teams", [])}
-        tier_filter = st.selectbox("Tier", ["Todos", "S", "A", "B", "C"], key="tier_dl")
+        
+        # Criar mapa de logos
+        logo_map = {t.get("name", ""): t.get("logo_url", "") for t in pro_teams.get("teams", [])}
+        
+        tier_filter = st.selectbox("🎯 Filtrar por Tier", ["Todos", "S", "A", "B", "C"], key="tier_dl")
         
         for team in teams:
             tier = team.get("tier", "C")
@@ -414,75 +450,111 @@ def render_dreamleague():
             pro_data = pro_map.get(team.get("team_id"), {})
             recent = pro_data.get("recent_stats", {}) if pro_data else {}
             current_roster = pro_data.get("current_roster", []) if pro_data else []
+            top_heroes = pro_data.get("top_heroes", []) if pro_data else []
             
-            # Card do time
+            # Buscar logo do time
+            team_logo = pro_data.get("logo_url", "") if pro_data else ""
+            logo_html = f"<img src='{team_logo}' style='width: 32px; height: 32px; border-radius: 4px; margin-right: 10px;'>" if team_logo else ""
+            
+            # Card do time com logo
             st.markdown(f"""
-            <div style='background: #1a1a2e; padding: 12px; border-radius: 8px; 
-                        margin: 6px 0; border-left: 3px solid {tier_color};'>
-                <div style='display: flex; justify-content: space-between; align-items: center;'>
-                    <span style='font-weight: bold; font-size: 16px;'>{team.get('name')}</span>
-                    <span style='background: {tier_color}; padding: 2px 8px; border-radius: 4px; 
-                                 font-size: 11px;'>Tier {tier}</span>
-                </div>
-                <div style='font-size: 12px; color: #888; margin-top: 4px;'>
-                    🌍 {team.get('region', 'EU')} • 📊 WR: {recent.get('winrate', 'N/A')}% • 
-                    🏆 #{team.get('ranking', '?')} • ⏱️ {recent.get('avg_duration_min', 'N/A')}min avg
+            <div style='background: #1a1a2e; padding: 14px; border-radius: 10px; 
+                        margin: 8px 0; border-left: 4px solid {tier_color};'>
+                <div style='display: flex; align-items: center;'>
+                    {logo_html}
+                    <div style='flex: 1;'>
+                        <div style='display: flex; justify-content: space-between; align-items: center;'>
+                            <span style='font-weight: bold; font-size: 17px;'>{team.get('name')}</span>
+                            <span style='background: {tier_color}; padding: 3px 10px; border-radius: 4px; 
+                                         font-size: 11px; font-weight: bold;'>Tier {tier}</span>
+                        </div>
+                        <div style='font-size: 12px; color: #888; margin-top: 4px;'>
+                            🌍 {team.get('region', 'EU')} • 🏆 #{team.get('ranking', '?')} • 
+                            📊 {recent.get('winrate', 'N/A')}% WR • ⏱️ {recent.get('avg_duration_min', 'N/A')}min
+                        </div>
+                    </div>
                 </div>
             </div>
             """, unsafe_allow_html=True)
             
-            # Expander com detalhes do roster
-            with st.expander(f"👥 {team.get('tag', '')} - Ver Jogadores & Stats"):
-                roles = ["⚔️ Carry", "🎯 Mid", "🛡️ Offlane", "💫 Soft Sup", "❤️ Hard Sup"]
+            # Expander com jogadores clicáveis
+            with st.expander(f"👥 {team.get('tag', '')} - Ver Jogadores & Detalhes"):
+                # Stats gerais do time
+                if recent:
+                    col1, col2, col3, col4 = st.columns(4)
+                    with col1:
+                        st.metric("✅ Vitórias", recent.get("wins", 0))
+                    with col2:
+                        st.metric("❌ Derrotas", recent.get("losses", 0))
+                    with col3:
+                        st.metric("📊 Win Rate", f"{recent.get('winrate', 0)}%")
+                    with col4:
+                        st.metric("🎮 Partidas", recent.get("matches", 0))
                 
-                # Mapear jogadores do pro_teams com roster do DL
+                st.markdown("---")
+                st.markdown("**🎮 Roster - Clique para detalhes**")
+                
+                roles = ["⚔️ Carry", "🎯 Mid", "🛡️ Offlane", "💫 Soft Sup", "❤️ Hard Sup"]
                 roster_basic = team.get("roster", [])
                 
                 for i, player_basic in enumerate(roster_basic[:5]):
                     player_name = player_basic.get("name", "Unknown")
                     role = roles[i] if i < 5 else "🎮 Sub"
                     
-                    # Buscar stats detalhados do jogador no pro_data
+                    # Buscar stats detalhados do jogador
                     player_stats = None
                     for p in current_roster:
-                        if p.get("name", "").lower() == player_name.lower():
+                        if p.get("name", "").lower() == player_name.lower() or player_name.lower() in p.get("name", "").lower():
                             player_stats = p
                             break
                     
-                    if player_stats:
-                        games = player_stats.get("games_played", 0)
-                        wins = player_stats.get("wins", 0)
-                        wr = player_stats.get("winrate", 0)
-                        
-                        st.markdown(f"""
-                        <div style='background: #252540; padding: 10px; border-radius: 6px; margin: 4px 0;'>
-                            <div style='display: flex; justify-content: space-between;'>
-                                <span><b>{role}</b> {player_name}</span>
-                                <span style='color: #4CAF50;'>{wr}% WR</span>
-                            </div>
-                            <div style='font-size: 11px; color: #888; margin-top: 4px;'>
-                                🎮 {games} jogos • ✅ {wins} vitórias
-                            </div>
-                        </div>
-                        """, unsafe_allow_html=True)
-                    else:
-                        st.markdown(f"""
-                        <div style='background: #252540; padding: 10px; border-radius: 6px; margin: 4px 0;'>
-                            <span><b>{role}</b> {player_name}</span>
-                        </div>
-                        """, unsafe_allow_html=True)
+                    # Card do jogador (sempre visível)
+                    games = player_stats.get("games_played", 0) if player_stats else 0
+                    wins = player_stats.get("wins", 0) if player_stats else 0
+                    wr = player_stats.get("winrate", 0) if player_stats else 0
+                    
+                    wr_color = "#4CAF50" if wr >= 55 else "#ff9800" if wr >= 50 else "#f44336"
+                    
+                    # Expander individual para cada jogador
+                    with st.expander(f"{role} **{player_name}** - {wr}% WR"):
+                        if player_stats:
+                            col1, col2, col3 = st.columns(3)
+                            with col1:
+                                st.metric("🎮 Jogos", games)
+                            with col2:
+                                st.metric("✅ Vitórias", wins)
+                            with col3:
+                                st.metric("📊 Win Rate", f"{wr}%")
+                            
+                            # Info adicional
+                            account_id = player_stats.get("account_id", "")
+                            if account_id:
+                                st.markdown(f"""
+                                **📊 Perfil do Jogador**
+                                - 🆔 Account ID: `{account_id}`
+                                - 🏆 Time: {team.get('name')}
+                                - 🎮 Posição: {role}
+                                - 📈 Taxa de Vitória: **{wr}%**
+                                
+                                [🔗 Ver no OpenDota](https://www.opendota.com/players/{account_id})
+                                """)
+                            else:
+                                st.caption("Account ID não disponível")
+                        else:
+                            st.caption(f"Stats detalhados não disponíveis para {player_name}")
                 
-                # Stats do time
-                if recent:
+                # Top Heroes do time
+                if top_heroes:
                     st.markdown("---")
-                    st.markdown("**📈 Stats do Time (100 jogos)**")
-                    col1, col2, col3 = st.columns(3)
-                    with col1:
-                        st.metric("Vitórias", recent.get("wins", 0))
-                    with col2:
-                        st.metric("Derrotas", recent.get("losses", 0))
-                    with col3:
-                        st.metric("Win Rate", f"{recent.get('winrate', 0)}%")
+                    st.markdown("**🦸 Top Heróis do Time**")
+                    cols = st.columns(5)
+                    for i, hero in enumerate(top_heroes[:5]):
+                        with cols[i]:
+                            hero_id = hero.get("hero_id", 0)
+                            hero_games = hero.get("games", 0)
+                            hero_wr = hero.get("winrate", 0)
+                            st.metric(f"Hero #{hero_id}", f"{hero_wr}% WR")
+                            st.caption(f"{hero_games} jogos")
     
     # TAB 3 - ODDS (Mobile) com Parser de Arquivos Rivalry
     with tab3:
