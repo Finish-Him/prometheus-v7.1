@@ -10,13 +10,13 @@ import time
 import paramiko
 from pathlib import Path
 
-# Configuration
+# Configuration from environment variables
 VPS_CONFIG = {
-    'host': '72.62.9.90',
-    'port': 22,
-    'username': 'root',
-    'password': 'Moises@24512987',
-    'domain': 'prometheus.mscconsultoriarj.com.br'
+    'host': os.environ['VPS_HOST'],
+    'port': int(os.environ.get('VPS_PORT', 22)),
+    'username': os.environ.get('VPS_USER', 'root'),
+    'password': os.environ['VPS_PASSWORD'],
+    'domain': os.environ.get('VPS_DOMAIN', 'your-domain.com')
 }
 
 APP_DIR = '/opt/prometheus/app'
@@ -34,41 +34,31 @@ class Colors:
     BOLD = '\033[1m'
 
 def print_step(step_num, total_steps, message):
-    """Print formatted step message"""
     print(f"\n{Colors.YELLOW}[{step_num}/{total_steps}] {message}{Colors.ENDC}")
 
 def print_success(message):
-    """Print success message"""
     print(f"{Colors.GREEN}✅ {message}{Colors.ENDC}")
 
 def print_error(message):
-    """Print error message"""
     print(f"{Colors.RED}❌ {message}{Colors.ENDC}")
 
 def print_info(message):
-    """Print info message"""
     print(f"{Colors.CYAN}ℹ️  {message}{Colors.ENDC}")
 
 def execute_ssh_command(ssh, command, show_output=True):
-    """Execute command via SSH and return output"""
     stdin, stdout, stderr = ssh.exec_command(command)
     exit_status = stdout.channel.recv_exit_status()
-    
     output = stdout.read().decode('utf-8')
     error = stderr.read().decode('utf-8')
-    
     if show_output and output:
         print(output)
-    
     if exit_status != 0:
         if error:
             print_error(f"Command failed: {error}")
         return False, error
-    
     return True, output
 
 def upload_file(sftp, local_path, remote_path):
-    """Upload file via SFTP"""
     try:
         sftp.put(local_path, remote_path)
         return True
@@ -82,10 +72,9 @@ def main():
     print("🔥 Prometheus V7 - Automated VPS Deploy")
     print("=" * 60)
     print(f"{Colors.ENDC}")
-    
-    # Connect to VPS
+
     print_step(1, 6, "Connecting to VPS...")
-    
+
     try:
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -100,101 +89,70 @@ def main():
     except Exception as e:
         print_error(f"Failed to connect: {e}")
         sys.exit(1)
-    
-    # Open SFTP session
+
     sftp = ssh.open_sftp()
-    
-    # Upload setup script
+
     print_step(2, 6, "Uploading setup script...")
-    
-    local_script = Path(__file__).parent / 'setup_vps.sh'
-    if local_script.exists():
-        if upload_file(sftp, str(local_script), '/root/setup_vps.sh'):
-            print_success("Setup script uploaded")
-            execute_ssh_command(ssh, "chmod +x /root/setup_vps.sh", show_output=False)
-        else:
-            print_error("Failed to upload setup script")
-            sys.exit(1)
+    setup_script = Path(__file__).parent / "setup_vps.sh"
+    if setup_script.exists():
+        upload_file(sftp, str(setup_script), "/tmp/setup_vps.sh")
+        execute_ssh_command(ssh, "chmod +x /tmp/setup_vps.sh")
+        print_success("Setup script uploaded")
     else:
-        print_error(f"Setup script not found: {local_script}")
+        print_error("setup_vps.sh not found")
         sys.exit(1)
-    
-    # Execute setup script
-    print_step(3, 6, "Executing setup on VPS (this may take 5-10 minutes)...")
-    print_info("Installing dependencies, cloning repository, configuring services...")
-    
-    success, output = execute_ssh_command(ssh, "/root/setup_vps.sh", show_output=True)
-    
-    if success:
-        print_success("Setup completed successfully")
-    else:
+
+    print_step(3, 6, "Running setup script...")
+    success, output = execute_ssh_command(ssh, f"bash /tmp/setup_vps.sh {REPO_URL} {APP_DIR}")
+    if not success:
         print_error("Setup script failed")
-        print_info("Check logs on VPS: journalctl -u prometheus -f")
-    
-    # Upload .env file
+        sys.exit(1)
+    print_success("Setup complete")
+
     print_step(4, 6, "Uploading environment variables...")
-    
-    local_env = Path(__file__).parent.parent / '.env.production'
-    if local_env.exists():
-        if upload_file(sftp, str(local_env), f'{APP_DIR}/.env'):
-            print_success("Environment variables uploaded")
-            # Set correct permissions
-            execute_ssh_command(ssh, f"chown prometheus:prometheus {APP_DIR}/.env", show_output=False)
-            execute_ssh_command(ssh, f"chmod 600 {APP_DIR}/.env", show_output=False)
-        else:
-            print_error("Failed to upload .env file")
+    env_file = Path(__file__).parent.parent / ".env"
+    if env_file.exists():
+        upload_file(sftp, str(env_file), f"{APP_DIR}/.env")
+        execute_ssh_command(ssh, f"chmod 600 {APP_DIR}/.env")
+        print_success(".env uploaded")
     else:
-        print_error(f".env.production not found at {local_env}")
-        print_info("You'll need to manually create .env on the VPS")
-    
-    # Restart service
-    print_step(5, 6, "Restarting Prometheus service...")
-    
-    execute_ssh_command(ssh, "systemctl restart prometheus", show_output=False)
-    time.sleep(3)
-    
-    success, output = execute_ssh_command(ssh, "systemctl is-active prometheus", show_output=False)
-    
-    if success and 'active' in output:
-        print_success("Prometheus service is running")
+        print_info(".env not found locally, skipping")
+
+    print_step(5, 6, "Starting application...")
+    execute_ssh_command(ssh, "systemctl restart prometheus")
+    time.sleep(5)
+    success, output = execute_ssh_command(ssh, "systemctl is-active prometheus")
+    if 'active' in output:
+        print_success("Application started")
     else:
-        print_error("Prometheus service failed to start")
-        print_info("Check logs: journalctl -u prometheus -n 50")
-    
-    # Verify deployment
+        print_error("Application failed to start")
+        execute_ssh_command(ssh, "journalctl -u prometheus -n 30 --no-pager")
+
     print_step(6, 6, "Verifying deployment...")
-    
-    success, output = execute_ssh_command(ssh, f"curl -s http://localhost:8501/health || echo 'Health check failed'", show_output=False)
-    
-    if 'OK' in output or success:
+    success, output = execute_ssh_command(ssh, "curl -s http://localhost:8501 | head -3")
+    if output:
         print_success("Application is responding")
     else:
-        print_error("Application health check failed")
-    
-    # Close connections
+        print_info("Application not yet responding (may need more time)")
+
     sftp.close()
     ssh.close()
-    
-    # Final summary
-    print(f"\n{Colors.BLUE}{Colors.BOLD}")
+
+    print(f"\n{Colors.GREEN}{Colors.BOLD}")
     print("=" * 60)
-    print("🎉 Deploy Complete!")
+    print("🎉 Deployment Complete!")
     print("=" * 60)
     print(f"{Colors.ENDC}")
-    print(f"\n📍 Application URL: {Colors.CYAN}http://{VPS_CONFIG['domain']}{Colors.ENDC}")
-    print(f"📍 Server IP: {Colors.CYAN}{VPS_CONFIG['host']}{Colors.ENDC}")
-    print(f"\n{Colors.YELLOW}Next Steps:{Colors.ENDC}")
-    print(f"  1. Test: curl http://{VPS_CONFIG['domain']}/health")
-    print(f"  2. Setup SSL: ssh root@{VPS_CONFIG['host']} 'certbot --nginx -d {VPS_CONFIG['domain']}'")
-    print(f"  3. Monitor: ssh root@{VPS_CONFIG['host']} 'journalctl -u prometheus -f'")
+    print(f"  🌐 http://{VPS_CONFIG['domain']}")
     print()
 
 if __name__ == '__main__':
     try:
         main()
-    except KeyboardInterrupt:
-        print(f"\n{Colors.YELLOW}Deploy interrupted by user{Colors.ENDC}")
+    except KeyError as e:
+        print(f"❌ Missing required environment variable: {e}")
+        print("Set VPS_HOST, VPS_PASSWORD (and optionally VPS_USER, VPS_PORT, VPS_DOMAIN) before running.")
         sys.exit(1)
     except Exception as e:
-        print_error(f"Unexpected error: {e}")
+        print(f"❌ Error: {e}")
         sys.exit(1)
