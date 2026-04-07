@@ -2,12 +2,16 @@
 OpenDota Team ID Resolver V2
 Busca times usando /proMatches e /teams endpoints
 """
+import os
 import requests
 import json
 import time
 
-API_KEY = '00495232-b2b4-4d0b-87e3-c01de846c4b4'
+API_KEY = os.environ.get("OPENDOTA_API_KEY", "")  # Set via environment variable
 BASE = 'https://api.opendota.com/api'
+
+if not API_KEY:
+    print("⚠️  OPENDOTA_API_KEY not set. Running without API key (rate limited).")
 
 # Times conhecidos (já temos os IDs)
 KNOWN_TEAMS = {
@@ -38,13 +42,21 @@ TEAMS_TO_FIND = [
     'Entity'
 ]
 
+def api_params(extra: dict = None) -> dict:
+    params = {}
+    if API_KEY:
+        params['api_key'] = API_KEY
+    if extra:
+        params.update(extra)
+    return params
+
 print('=' * 60)
 print('PROMETHEUS V7 - Team ID Resolver V2')
 print('=' * 60)
 
 # 1. Buscar times recentes via /proMatches
 print('\n[1] Buscando partidas profissionais recentes...')
-r = requests.get(f'{BASE}/proMatches', params={'api_key': API_KEY})
+r = requests.get(f'{BASE}/proMatches', params=api_params())
 pro_matches = r.json()[:100]  # Últimas 100 partidas pro
 
 # Extrair times únicos
@@ -60,7 +72,7 @@ print(f'   Encontrados {len(teams_from_matches)} times em partidas recentes')
 
 # 2. Buscar times via /teams (top por rating)
 print('\n[2] Buscando times top por rating...')
-r = requests.get(f'{BASE}/teams', params={'api_key': API_KEY})
+r = requests.get(f'{BASE}/teams', params=api_params())
 all_teams = r.json()[:500]  # Top 500 times
 
 teams_by_name = {t['name']: t['team_id'] for t in all_teams if t.get('name')}
@@ -89,7 +101,6 @@ for term in TEAMS_TO_FIND:
     # Busca por tag
     for tag, tid in teams_by_tag.items():
         if term.lower() in tag.lower():
-            # Pegar o nome do time
             for t in all_teams:
                 if t['team_id'] == tid:
                     search_results[t['name']] = tid
