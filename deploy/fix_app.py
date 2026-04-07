@@ -3,15 +3,16 @@
 Fix blank screen issue by deploying working app.py
 """
 
+import os
 import paramiko
 import sys
 from pathlib import Path
 
 VPS_CONFIG = {
-    'host': '72.62.9.90',
-    'port': 22,
-    'username': 'root',
-    'password': 'Moises@24512987'
+    'host': os.environ['VPS_HOST'],
+    'port': int(os.environ.get('VPS_PORT', 22)),
+    'username': os.environ.get('VPS_USER', 'root'),
+    'password': os.environ['VPS_PASSWORD']
 }
 
 def execute_command(ssh, command):
@@ -92,16 +93,16 @@ def main():
     print("\n" + "="*60)
     print("🎉 Fix applied!")
     print("="*60)
-    print("\nTest the application:")
-    print("  - VPS: https://prometheus.mscconsultoriarj.com.br")
-    print("  - Streamlit Cloud: Push to GitHub to update")
+    print("\nTest the application at your configured domain.")
     print()
 
 if __name__ == '__main__':
     try:
         main()
+    except KeyError as e:
+        print(f"❌ Missing required environment variable: {e}")
+        print("Set VPS_HOST, VPS_PASSWORD (and optionally VPS_USER, VPS_PORT) before running.")
+        sys.exit(1)
     except Exception as e:
         print(f"❌ Error: {e}")
-        import traceback
-        traceback.print_exc()
         sys.exit(1)
