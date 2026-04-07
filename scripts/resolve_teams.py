@@ -1,12 +1,16 @@
 """
 Quick Team ID Resolver - OpenDota API
 """
+import os
 import requests
 import json
 import time
 
-API_KEY = '00495232-b2b4-4d0b-87e3-c01de846c4b4'
+API_KEY = os.environ.get("OPENDOTA_API_KEY", "")  # Set via environment variable
 BASE = 'https://api.opendota.com/api'
+
+if not API_KEY:
+    print("⚠️  OPENDOTA_API_KEY not set. Running without API key (rate limited).")
 
 teams_to_find = [
     ('Team Falcons', 'Falcons'),
@@ -29,15 +33,22 @@ teams_to_find = [
 
 print('=' * 60)
 print('PROMETHEUS V7 - OpenDota Team ID Resolver')
-print('API Key: Premium (3000 req/min)')
 print('=' * 60)
 
 found = {}
 not_found = []
 
+def api_params(extra: dict = None) -> dict:
+    params = {}
+    if API_KEY:
+        params['api_key'] = API_KEY
+    if extra:
+        params.update(extra)
+    return params
+
 for full_name, search_term in teams_to_find:
     try:
-        r = requests.get(f'{BASE}/search', params={'q': search_term, 'api_key': API_KEY}, timeout=10)
+        r = requests.get(f'{BASE}/search', params=api_params({'q': search_term}), timeout=10)
         if r.status_code == 200:
             data = r.json()
             if data:
